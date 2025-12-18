@@ -5,6 +5,13 @@ import java.net.URI
 plugins {
     java
     `jvm-test-suite`
+    id("com.rrmoore.gradle.helm-test-java")
+}
+
+java {
+    toolchain {
+        languageVersion = JavaLanguageVersion.of(25)
+    }
 }
 
 repositories {
