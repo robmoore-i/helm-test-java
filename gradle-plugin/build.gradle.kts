@@ -1,10 +1,15 @@
 plugins {
     `java-gradle-plugin`
+    id("org.jetbrains.kotlin.jvm") version "2.2.0"
     id("com.gradle.plugin-publish") version "2.0.0"
 }
 
 version = "0.1.0"
 group = "com.rrmoore.gradle"
+
+repositories {
+    mavenCentral()
+}
 
 java {
     toolchain {
