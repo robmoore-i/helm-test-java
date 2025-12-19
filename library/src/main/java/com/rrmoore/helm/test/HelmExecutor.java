@@ -1,10 +1,13 @@
 package com.rrmoore.helm.test;
 
+import io.kubernetes.client.common.KubernetesObject;
+import io.kubernetes.client.util.Yaml;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
 import java.time.Duration;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 
@@ -73,7 +76,18 @@ public class HelmExecutor {
         }
     }
 
-    public String template() {
-        return executeHelm(List.of("template", chart.getAbsolutePath()));
+    public Manifests template() {
+        var output = executeHelm(List.of("template", chart.getAbsolutePath()));
+        var renderedObjects = Arrays.stream(output.split("---"))
+            .skip(1)
+            .map(yaml -> {
+                try {
+                    return (KubernetesObject) Yaml.load(yaml);
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
+                }
+            })
+            .toList();
+        return new Manifests(renderedObjects);
     }
 }

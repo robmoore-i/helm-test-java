@@ -19,8 +19,10 @@ public class HelmExecutorTest {
 
     @Test
     void canRenderTemplateWithoutValues() {
-        var output = helm.template();
+        var manifests = helm.template();
 
-        assert output.contains("Deployment");
+        var deployment = manifests.findDeployment("my-app");
+
+        assertEquals("main", deployment.getSpec().getTemplate().getSpec().getContainers().getFirst().getName());
     }
 }

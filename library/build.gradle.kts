@@ -18,6 +18,10 @@ java {
     }
 }
 
+dependencies {
+    implementation("io.kubernetes:client-java:25.0.0")
+}
+
 testing {
     suites {
         val test by getting(JvmTestSuite::class) {
