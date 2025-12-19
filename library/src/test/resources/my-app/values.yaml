@@ -1,0 +1,4 @@
+# Default values for my-app.
+replicas: 1
+image:
+  pullPolicy: IfNotPresent

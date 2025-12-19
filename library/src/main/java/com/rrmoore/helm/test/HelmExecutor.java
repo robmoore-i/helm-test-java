@@ -14,29 +14,37 @@ import java.util.Objects;
 public class HelmExecutor {
 
     private final File helmExecutable;
+    private final File chart;
 
     /**
      * Creates a Helm executor, determining the path to the Helm executable file using a JVM system property,
      * which is set automatically by applying the helm-test-java Gradle plugin.
      */
-    public HelmExecutor() {
-        this(new File(Objects.requireNonNull(
-            System.getProperty("com.rrmoore.helm.test.executable.path"),
-            "Missing system property for determining the path to the Helm executable downloaded by the helm-test-java Gradle plugin. " +
-                "Is the plugin applied to this Gradle build?"
-        )));
+    public HelmExecutor(File chart) {
+        this(
+            new File(Objects.requireNonNull(
+                System.getProperty("com.rrmoore.helm.test.executable.path"),
+                "Missing system property for determining the path to the Helm executable downloaded by the helm-test-java Gradle plugin. " +
+                    "Is the plugin applied to this Gradle build?"
+            )),
+            chart
+        );
     }
 
     /**
      * Creates a Helm executor, using the provided Helm executable File i.e. the runnable `helm` binary file.
      */
-    public HelmExecutor(File helmExecutable) {
+    public HelmExecutor(File helmExecutable, File chart) {
         if (!helmExecutable.isFile()) {
             throw new IllegalArgumentException("Helm executable file '" + helmExecutable.getAbsolutePath() + "' does not exist.");
         } else if (!helmExecutable.canExecute() && !helmExecutable.setExecutable(true)) {
             throw new IllegalArgumentException("Helm executable file '" + helmExecutable.getAbsolutePath() + "' is not executable, and failed in an attempt to set it to be executable.");
         }
+        if (!chart.exists()) {
+            throw new IllegalArgumentException("Helm chart '" + chart.getAbsolutePath() + "' does not exist.");
+        }
         this.helmExecutable = helmExecutable;
+        this.chart = chart;
     }
 
     /**
@@ -63,5 +71,9 @@ public class HelmExecutor {
         } catch (IOException | InterruptedException e) {
             throw new RuntimeException("Helm execution failed for command '" + String.join(" ", command) + "'", e);
         }
+    }
+
+    public String template() {
+        return executeHelm(List.of("template", chart.getAbsolutePath()));
     }
 }
