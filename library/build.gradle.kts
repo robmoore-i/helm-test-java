@@ -1,8 +1,10 @@
 @file:Suppress("UnstableApiUsage")
 
+
 plugins {
     java
     `jvm-test-suite`
+    id("com.rrmoore.gradle.helm-test-java")
     id("com.vanniktech.maven.publish") version "0.35.0"
 }
 
@@ -16,6 +18,10 @@ testing {
             useJUnitJupiter()
         }
     }
+}
+
+helmToolchain {
+    helmVersion = "3.19.4"
 }
 
 mavenPublishing {

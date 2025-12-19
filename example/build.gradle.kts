@@ -1,6 +1,5 @@
 @file:Suppress("UnstableApiUsage")
 
-import com.rrmoore.gradle.helm.test.PlatformIdentifier
 import java.net.URI
 
 plugins {
@@ -29,7 +28,6 @@ repositories {
 
 helmToolchain {
     helmVersion = "3.19.4"
-    platformIdentifier = PlatformIdentifier.DARWIN_AMD64
 }
 
 testing {
