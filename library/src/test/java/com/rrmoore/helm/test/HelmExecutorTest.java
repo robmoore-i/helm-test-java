@@ -57,4 +57,15 @@ public class HelmExecutorTest {
         assertEquals("Always", deployment.getSpec().getTemplate().getSpec().getContainers().getFirst().getImagePullPolicy());
         assertEquals(2, deployment.getSpec().getReplicas());
     }
+
+    @Test
+    void canShowTemplateErrors() {
+        var values = """
+            image:
+              pullPolicy: VeryBad
+            """;
+
+        var error = helm.templateError(values);
+        assert error.contains("Don't use the VeryBad image pull policy!");
+    }
 }

@@ -15,6 +15,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
+import java.util.function.Function;
 import java.util.stream.Stream;
 
 /**
@@ -62,11 +63,13 @@ public class HelmExecutor {
      * Runs `helm version`
      */
     public String version() {
-        return executeHelm(List.of("version"));
+        return executeHelmForOutput(List.of("version"));
     }
 
     /**
      * Runs `helm template`
+     *
+     * @return Parsed, rendered Kubernetes manifests.
      */
     public Manifests template() {
         return executeHelmTemplate(List.of());
@@ -74,6 +77,8 @@ public class HelmExecutor {
 
     /**
      * Runs `helm template`, passing in the provided YAML-formatted values.
+     *
+     * @return Parsed, rendered Kubernetes manifests.
      */
     public Manifests template(String valuesYaml) {
         return template(List.of(valuesYaml));
@@ -81,24 +86,39 @@ public class HelmExecutor {
 
     /**
      * Runs `helm template`, passing in all of the provided YAML-formatted values.
+     *
+     * @return Parsed, rendered Kubernetes manifests.
      */
     public Manifests template(List<String> valuesYamls) {
+        return executeHelmTemplate(templateValuesArgs(valuesYamls));
+    }
+
+    /**
+     * Runs `helm template` with the expectation that it will fail.
+     *
+     * @return The error output of the `helm` process.
+     */
+    public String templateError(String valuesYaml) {
+        var helmArgs = new ArrayList<>(List.of("template", chart.getAbsolutePath()));
+        helmArgs.addAll(templateValuesArgs(List.of(valuesYaml)));
+        return executeHelmForError(helmArgs);
+    }
+
+    private List<String> templateValuesArgs(List<String> valuesYamls) {
         var timestamp = formatter.format(Instant.now().atZone(ZoneOffset.UTC));
-        var valuesArgs = valuesYamls
-            .stream()
+        return valuesYamls.stream()
             .flatMap(valuesYaml -> {
                 var valuesFile = Exceptions.uncheck(() -> File.createTempFile("helm-test-values-yaml-" + timestamp + "-", ".yaml"));
                 Exceptions.uncheck(() -> Files.writeString(valuesFile.toPath(), valuesYaml));
                 return Stream.of("--values", valuesFile.getAbsolutePath());
             })
             .toList();
-        return executeHelmTemplate(valuesArgs);
     }
 
     private Manifests executeHelmTemplate(List<String> args) {
         var helmArgs = new ArrayList<>(List.of("template", chart.getAbsolutePath()));
         helmArgs.addAll(args);
-        var output = executeHelm(helmArgs);
+        var output = executeHelmForOutput(helmArgs);
         var renderedObjects = Arrays.stream(output.split("---"))
             .skip(1)
             .map(yaml -> Exceptions.uncheck(() -> (KubernetesObject) Yaml.load(yaml)))
@@ -106,17 +126,27 @@ public class HelmExecutor {
         return new Manifests(renderedObjects);
     }
 
-    private String executeHelm(List<String> args) {
+    private String executeHelmForOutput(List<String> args) {
+        return executeHelm(args, Process::inputReader, true);
+    }
+
+    private String executeHelmForError(List<String> args) {
+        return executeHelm(args, Process::errorReader, false);
+    }
+
+    private String executeHelm(List<String> args, Function<Process, BufferedReader> processReader, boolean expectSuccess) {
         var command = new ArrayList<>(List.of(helmExecutable.getAbsolutePath()));
         command.addAll(args);
         try {
             var process = new ProcessBuilder(command).start();
             process.waitFor(Duration.ofSeconds(1));
-            try (BufferedReader bufferedReader = process.inputReader()) {
+            try (BufferedReader bufferedReader = processReader.apply(process)) {
                 var output = String.join("\n", bufferedReader.readAllLines());
                 int exitCode = process.exitValue();
-                if (exitCode != 0) {
+                if (exitCode != 0 && expectSuccess) {
                     throw new RuntimeException("Command '" + String.join(" ", command) + "' finished with exit code " + exitCode + ".");
+                } else if (exitCode == 0 && !expectSuccess) {
+                    throw new RuntimeException("Command '" + String.join(" ", command) + "' unexpectedly finished with exit code 0.");
                 }
                 return output;
             }
