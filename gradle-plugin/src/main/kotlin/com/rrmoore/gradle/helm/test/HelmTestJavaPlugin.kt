@@ -43,10 +43,12 @@ class HelmTestJavaPlugin : Plugin<Project> {
             extension.helmVersion.zip(extension.platformIdentifier, HelmArtifactDependency::helmArtifactCoordinates)
         )
 
+        extension.helmExecutable.convention(expandHelmExecutable.zip(extension.platformIdentifier) { task, platformIdentifier -> task.destinationDir.resolve("$platformIdentifier/helm") })
+
         project.tasks.withType(Test::class.java) { testTask ->
             testTask.jvmArgumentProviders += FileArgumentProvider(
                 "com.rrmoore.helm.test.executable.path",
-                expandHelmExecutable.zip(extension.platformIdentifier) { task, platformIdentifier -> task.destinationDir.resolve("$platformIdentifier/helm") }
+                extension.helmExecutable
             )
         }
     }

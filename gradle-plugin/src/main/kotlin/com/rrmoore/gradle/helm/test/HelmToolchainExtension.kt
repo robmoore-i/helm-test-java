@@ -1,5 +1,6 @@
 package com.rrmoore.gradle.helm.test
 
+import java.io.File
 import javax.inject.Inject
 import org.gradle.api.model.ObjectFactory
 import org.gradle.api.provider.Property
@@ -19,4 +20,9 @@ abstract class HelmToolchainExtension @Inject constructor(objects: ObjectFactory
      * Look at the [Helm releases page on GitHub](https://github.com/helm/helm/releases) to see available versions.
      */
     val helmVersion: Property<String> = objects.property(String::class.java)
+
+    /**
+     * The executable `helm` file.
+     */
+    val helmExecutable: Property<File> = objects.property(File::class.java)
 }
