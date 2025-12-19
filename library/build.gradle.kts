@@ -38,7 +38,7 @@ mavenPublishing {
     publishToMavenCentral()
     signAllPublications()
 
-    coordinates("com.rrmoore", "helm-test-java", "0.1.0-SNAPSHOT")
+    coordinates("com.rrmoore", "helm-test-java", "0.2.0-SNAPSHOT")
     pom {
         name.set("Helm Test Java")
         description.set("A library for writing automated tests for Helm charts")
