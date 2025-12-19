@@ -12,6 +12,12 @@ repositories {
     mavenCentral()
 }
 
+java {
+    toolchain {
+        languageVersion = JavaLanguageVersion.of(25)
+    }
+}
+
 testing {
     suites {
         val test by getting(JvmTestSuite::class) {
