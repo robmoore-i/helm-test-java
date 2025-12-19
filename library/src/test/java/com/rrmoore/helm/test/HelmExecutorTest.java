@@ -24,7 +24,6 @@ public class HelmExecutorTest {
         var manifests = helm.template();
 
         var deployment = manifests.findDeployment("my-app");
-
         assertEquals("IfNotPresent", deployment.getSpec().getTemplate().getSpec().getContainers().getFirst().getImagePullPolicy());
     }
 
@@ -34,10 +33,10 @@ public class HelmExecutorTest {
             image:
               pullPolicy: Always
             """;
+
         var manifests = helm.template(values);
 
         var deployment = manifests.findDeployment("my-app");
-
         assertEquals("Always", deployment.getSpec().getTemplate().getSpec().getContainers().getFirst().getImagePullPolicy());
     }
 
@@ -50,10 +49,10 @@ public class HelmExecutorTest {
         var valuesB = """
             replicas: 2
             """;
+
         var manifests = helm.template(List.of(valuesA, valuesB));
 
         var deployment = manifests.findDeployment("my-app");
-
         assertEquals("Always", deployment.getSpec().getTemplate().getSpec().getContainers().getFirst().getImagePullPolicy());
         assertEquals(2, deployment.getSpec().getReplicas());
     }
