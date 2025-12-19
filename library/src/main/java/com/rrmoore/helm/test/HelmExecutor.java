@@ -15,6 +15,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
+import java.util.stream.Stream;
 
 /**
  * Wraps the Helm executable in a usable interface for writing automated tests.
@@ -88,10 +89,20 @@ public class HelmExecutor {
     }
 
     public Manifests template(String valuesYaml) {
+        return template(List.of(valuesYaml));
+    }
+
+    public Manifests template(List<String> valuesYamls) {
         var timestamp = formatter.format(Instant.now().atZone(ZoneOffset.UTC));
-        var valuesFile = Exceptions.uncheck(() -> File.createTempFile("helm-test-values-yaml-" + timestamp + "-", ".yaml"));
-        Exceptions.uncheck(() -> Files.writeString(valuesFile.toPath(), valuesYaml));
-        return executeHelmTemplate(List.of("--values", valuesFile.getAbsolutePath()));
+        var valuesArgs = valuesYamls
+            .stream()
+            .flatMap(valuesYaml -> {
+                var valuesFile = Exceptions.uncheck(() -> File.createTempFile("helm-test-values-yaml-" + timestamp + "-", ".yaml"));
+                Exceptions.uncheck(() -> Files.writeString(valuesFile.toPath(), valuesYaml));
+                return Stream.of("--values", valuesFile.getAbsolutePath());
+            })
+            .toList();
+        return executeHelmTemplate(valuesArgs);
     }
 
     private Manifests executeHelmTemplate(List<String> args) {

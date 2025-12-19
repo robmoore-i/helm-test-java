@@ -1,6 +1,7 @@
 package com.rrmoore.helm.test;
 
 import java.io.File;
+import java.util.List;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -38,5 +39,22 @@ public class HelmExecutorTest {
         var deployment = manifests.findDeployment("my-app");
 
         assertEquals("Always", deployment.getSpec().getTemplate().getSpec().getContainers().getFirst().getImagePullPolicy());
+    }
+
+    @Test
+    void canRenderTemplateWithMultipleValues() {
+        var valuesA = """
+            image:
+              pullPolicy: Always
+            """;
+        var valuesB = """
+            replicas: 2
+            """;
+        var manifests = helm.template(List.of(valuesA, valuesB));
+
+        var deployment = manifests.findDeployment("my-app");
+
+        assertEquals("Always", deployment.getSpec().getTemplate().getSpec().getContainers().getFirst().getImagePullPolicy());
+        assertEquals(2, deployment.getSpec().getReplicas());
     }
 }
