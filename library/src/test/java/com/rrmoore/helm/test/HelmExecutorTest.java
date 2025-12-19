@@ -1,5 +1,6 @@
 package com.rrmoore.helm.test;
 
+import io.kubernetes.client.openapi.models.V1Deployment;
 import java.io.File;
 import java.util.List;
 import org.junit.jupiter.api.Test;
@@ -23,7 +24,7 @@ public class HelmExecutorTest {
     void canRenderTemplateWithoutValues() {
         var manifests = helm.template();
 
-        var deployment = manifests.findDeployment("my-app");
+        var deployment = (V1Deployment) manifests.getOne("apps/v1", "Deployment", "my-app");
         assertEquals("IfNotPresent", deployment.getSpec().getTemplate().getSpec().getContainers().getFirst().getImagePullPolicy());
     }
 
@@ -36,7 +37,7 @@ public class HelmExecutorTest {
 
         var manifests = helm.template(values);
 
-        var deployment = manifests.findDeployment("my-app");
+        var deployment = (V1Deployment) manifests.getOne("apps/v1", "Deployment", "my-app");
         assertEquals("Always", deployment.getSpec().getTemplate().getSpec().getContainers().getFirst().getImagePullPolicy());
     }
 
@@ -52,7 +53,7 @@ public class HelmExecutorTest {
 
         var manifests = helm.template(List.of(valuesA, valuesB));
 
-        var deployment = manifests.findDeployment("my-app");
+        var deployment = (V1Deployment) manifests.getOne("apps/v1", "Deployment", "my-app");
         assertEquals("Always", deployment.getSpec().getTemplate().getSpec().getContainers().getFirst().getImagePullPolicy());
         assertEquals(2, deployment.getSpec().getReplicas());
     }
