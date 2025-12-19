@@ -5,6 +5,7 @@ import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
+@SuppressWarnings("DataFlowIssue")
 public class HelmExecutorTest {
 
     private final HelmExecutor helm = new HelmExecutor(new File("src/test/resources/my-app"));
@@ -23,6 +24,19 @@ public class HelmExecutorTest {
 
         var deployment = manifests.findDeployment("my-app");
 
-        assertEquals("main", deployment.getSpec().getTemplate().getSpec().getContainers().getFirst().getName());
+        assertEquals("IfNotPresent", deployment.getSpec().getTemplate().getSpec().getContainers().getFirst().getImagePullPolicy());
+    }
+
+    @Test
+    void canRenderTemplateWithValues() {
+        var values = """
+            image:
+              pullPolicy: Always
+            """;
+        var manifests = helm.template(values);
+
+        var deployment = manifests.findDeployment("my-app");
+
+        assertEquals("Always", deployment.getSpec().getTemplate().getSpec().getContainers().getFirst().getImagePullPolicy());
     }
 }

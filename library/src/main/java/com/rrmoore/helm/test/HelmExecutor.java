@@ -1,11 +1,16 @@
 package com.rrmoore.helm.test;
 
+import com.rrmoore.helm.test.jdkext.Exceptions;
 import io.kubernetes.client.common.KubernetesObject;
 import io.kubernetes.client.util.Yaml;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Files;
 import java.time.Duration;
+import java.time.Instant;
+import java.time.ZoneOffset;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -18,6 +23,8 @@ public class HelmExecutor {
 
     private final File helmExecutable;
     private final File chart;
+
+    private final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("uuuuMMddHHmmss");
 
     /**
      * Creates a Helm executor, determining the path to the Helm executable file using a JVM system property,
@@ -77,16 +84,23 @@ public class HelmExecutor {
     }
 
     public Manifests template() {
-        var output = executeHelm(List.of("template", chart.getAbsolutePath()));
+        return executeHelmTemplate(List.of());
+    }
+
+    public Manifests template(String valuesYaml) {
+        var timestamp = formatter.format(Instant.now().atZone(ZoneOffset.UTC));
+        var valuesFile = Exceptions.uncheck(() -> File.createTempFile("helm-test-values-yaml-" + timestamp + "-", ".yaml"));
+        Exceptions.uncheck(() -> Files.writeString(valuesFile.toPath(), valuesYaml));
+        return executeHelmTemplate(List.of("--values", valuesFile.getAbsolutePath()));
+    }
+
+    private Manifests executeHelmTemplate(List<String> args) {
+        var helmArgs = new ArrayList<>(List.of("template", chart.getAbsolutePath()));
+        helmArgs.addAll(args);
+        var output = executeHelm(helmArgs);
         var renderedObjects = Arrays.stream(output.split("---"))
             .skip(1)
-            .map(yaml -> {
-                try {
-                    return (KubernetesObject) Yaml.load(yaml);
-                } catch (IOException e) {
-                    throw new RuntimeException(e);
-                }
-            })
+            .map(yaml -> Exceptions.uncheck(() -> (KubernetesObject) Yaml.load(yaml)))
             .toList();
         return new Manifests(renderedObjects);
     }
