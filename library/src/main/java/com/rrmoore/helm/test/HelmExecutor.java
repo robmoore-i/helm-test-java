@@ -65,33 +65,23 @@ public class HelmExecutor {
         return executeHelm(List.of("version"));
     }
 
-    private String executeHelm(List<String> args) {
-        var command = new ArrayList<>(List.of(helmExecutable.getAbsolutePath()));
-        command.addAll(args);
-        try {
-            var process = new ProcessBuilder(command).start();
-            process.waitFor(Duration.ofSeconds(1));
-            try (BufferedReader bufferedReader = process.inputReader()) {
-                var output = String.join("\n", bufferedReader.readAllLines());
-                int exitCode = process.exitValue();
-                if (exitCode != 0) {
-                    throw new RuntimeException("Command '" + String.join(" ", command) + "' finished with exit code " + exitCode + ".");
-                }
-                return output;
-            }
-        } catch (IOException | InterruptedException e) {
-            throw new RuntimeException("Helm execution failed for command '" + String.join(" ", command) + "'", e);
-        }
-    }
-
+    /**
+     * Runs `helm template`
+     */
     public Manifests template() {
         return executeHelmTemplate(List.of());
     }
 
+    /**
+     * Runs `helm template`, passing in the provided YAML-formatted values.
+     */
     public Manifests template(String valuesYaml) {
         return template(List.of(valuesYaml));
     }
 
+    /**
+     * Runs `helm template`, passing in all of the provided YAML-formatted values.
+     */
     public Manifests template(List<String> valuesYamls) {
         var timestamp = formatter.format(Instant.now().atZone(ZoneOffset.UTC));
         var valuesArgs = valuesYamls
@@ -114,5 +104,24 @@ public class HelmExecutor {
             .map(yaml -> Exceptions.uncheck(() -> (KubernetesObject) Yaml.load(yaml)))
             .toList();
         return new Manifests(renderedObjects);
+    }
+
+    private String executeHelm(List<String> args) {
+        var command = new ArrayList<>(List.of(helmExecutable.getAbsolutePath()));
+        command.addAll(args);
+        try {
+            var process = new ProcessBuilder(command).start();
+            process.waitFor(Duration.ofSeconds(1));
+            try (BufferedReader bufferedReader = process.inputReader()) {
+                var output = String.join("\n", bufferedReader.readAllLines());
+                int exitCode = process.exitValue();
+                if (exitCode != 0) {
+                    throw new RuntimeException("Command '" + String.join(" ", command) + "' finished with exit code " + exitCode + ".");
+                }
+                return output;
+            }
+        } catch (IOException | InterruptedException e) {
+            throw new RuntimeException("Helm execution failed for command '" + String.join(" ", command) + "'", e);
+        }
     }
 }
