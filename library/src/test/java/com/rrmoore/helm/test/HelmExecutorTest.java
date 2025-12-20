@@ -68,4 +68,18 @@ public class HelmExecutorTest {
         var error = helm.templateError(values);
         assert error.contains("Don't use the VeryBad image pull policy!");
     }
+
+    @Test
+    void canShowTemplateErrorsForMultipleValues() {
+        var valuesA = """
+            image:
+              pullPolicy: VeryBad
+            """;
+        var valuesB = """
+            replicas: 2
+            """;
+
+        var error = helm.templateError(List.of(valuesA, valuesB));
+        assert error.contains("Don't use the VeryBad image pull policy!");
+    }
 }

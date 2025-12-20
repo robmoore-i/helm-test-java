@@ -85,7 +85,7 @@ public class HelmExecutor {
     }
 
     /**
-     * Runs `helm template`, passing in all of the provided YAML-formatted values.
+     * Runs `helm template`, passing in all the provided YAML-formatted values.
      *
      * @return Parsed, rendered Kubernetes manifests.
      */
@@ -94,13 +94,22 @@ public class HelmExecutor {
     }
 
     /**
-     * Runs `helm template` with the expectation that it will fail.
+     * Runs `helm template`, passing in the provided YAML-formatted values, with the expectation that it will fail.
      *
      * @return The error output of the `helm` process.
      */
     public String templateError(String valuesYaml) {
+        return templateError(List.of(valuesYaml));
+    }
+
+    /**
+     * Runs `helm template`, passing in all the provided YAML-formatted values, with the expectation that it will fail.
+     *
+     * @return The error output of the `helm` process.
+     */
+    public String templateError(List<String> valuesYamls) {
         var helmArgs = new ArrayList<>(List.of("template", chart.getAbsolutePath()));
-        helmArgs.addAll(templateValuesArgs(List.of(valuesYaml)));
+        helmArgs.addAll(templateValuesArgs(valuesYamls));
         return executeHelmForError(helmArgs);
     }
 
