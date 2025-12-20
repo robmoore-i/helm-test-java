@@ -3,4 +3,5 @@
 A library for writing automated tests for Helm charts.
 
 TODO:
-- The example project should have a Helm chart which demonstrates use of the library.
+- When Helm fails, the error message should always include stderr.
+- Write tests for the example chart using the library.
