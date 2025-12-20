@@ -1,0 +1,39 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: gym-register-app
+  labels:
+    app.kubernetes.io/name: gym-register-app
+spec:
+  replicas: {{ .Values.gymRegisterApp.replicas | default 1 }}
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: gym-register-app
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: gym-register-app
+    spec:
+      serviceAccountName: gym-register-app
+      containers:
+        - name: main
+          image: {{ include "gymregister.image.name" (dict "name" "gym-register-app") }}
+          imagePullPolicy: {{ .Values.image.imagePullPolicy | default "IfNotPresent" }}
+          env:
+          - name: GYM_REGISTER_APP__ALLOW_WALK_INS
+            valueFrom:
+              configMapKeyRef:
+                name: gym-register-app-config
+                key: allowWalkIns
+          ports:
+            - name: http
+              containerPort: 80
+              protocol: TCP
+          livenessProbe:
+            httpGet:
+              path: /
+              port: http
+          readinessProbe:
+            httpGet:
+              path: /
+              port: http

@@ -1,0 +1,6 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: gym-register-app-config
+data:
+  allowWalkIns: {{ eq .Values.gymRegisterApp.walkInPolicy "allow" | quote }}

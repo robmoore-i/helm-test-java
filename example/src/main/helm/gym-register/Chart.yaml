@@ -1,0 +1,6 @@
+apiVersion: v2
+name: gym-register
+description: Helm chart for the Gym Register app
+type: application
+version: 1.0.0
+appVersion: 1.0

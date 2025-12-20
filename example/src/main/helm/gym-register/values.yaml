@@ -1,0 +1,18 @@
+# Gym Register App: Helm Chart values
+
+### Image values:
+# image:
+#   imagePullPolicy: IfNotPresent
+
+### Gym Register App values:
+# gymRegisterApp:
+#   automountServiceAccountToken: true
+#   replicas: 1
+#   walkInPolicy: "allow"
+
+### Database values:
+# database:
+#   automountServiceAccountToken: true
+#   credentials:
+#     superuser:
+#       password: super-secret-password
