@@ -1,15 +1,26 @@
 package com.rrmoore.helm.test;
 
 import io.kubernetes.client.common.KubernetesObject;
+import io.kubernetes.client.openapi.models.V1ConfigMap;
+import io.kubernetes.client.openapi.models.V1Deployment;
+import io.kubernetes.client.openapi.models.V1Ingress;
+import io.kubernetes.client.openapi.models.V1Job;
+import io.kubernetes.client.openapi.models.V1PersistentVolumeClaim;
+import io.kubernetes.client.openapi.models.V1Secret;
+import io.kubernetes.client.openapi.models.V1Service;
+import io.kubernetes.client.openapi.models.V1ServiceAccount;
+import io.kubernetes.client.openapi.models.V1StatefulSet;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.function.Predicate;
+import kotlin.text.Charsets;
 
 /**
  * Represents the rendered Kubernetes manifests created by `helm template`.
  * <p>
  * You should create a decorator for this class which encapsulates specific information about the Helm chart you're testing.
- * You can also add convenient methods to your decorator such as getDeployment, getService etc. to minimise boilerplate.
+ * In your decorator, you can add methods to get different kinds of rendered Kubernetes objects, which are not covered exhaustively in this class.
  */
 public class Manifests {
 
@@ -29,7 +40,7 @@ public class Manifests {
     }
 
     /**
-     * @return The one rendered Kubernetes object matching the provided predicate, or Optional.empty() otherwise.
+     * @return The one rendered Kubernetes object matching the provided predicate if there is one, or Optional.empty() otherwise.
      * @throws java.lang.IllegalArgumentException if more than one Kubernetes object matches the predicate.
      *                                            Use {@link #findAll(java.util.function.Predicate)} if you have no strict expectations about how many objects match the predicate.
      */
@@ -42,7 +53,7 @@ public class Manifests {
     }
 
     /**
-     * @return The one rendered Kubernetes object matching the provided predicate, throws otherwise.
+     * @return The one rendered Kubernetes object matching the provided predicate.
      * @throws java.lang.IllegalArgumentException if either zero or more than one Kubernetes object match the predicate.
      *                                            Use {@link #findOne(java.util.function.Predicate)} if it's acceptable for no objects to match the predicate.
      *                                            Use {@link #findAll(java.util.function.Predicate)} if you have no strict expectations about how many objects match the predicate.
@@ -53,12 +64,74 @@ public class Manifests {
     }
 
     /**
-     * @return The one rendered Kubernetes object with the provided Kind and Name, throws otherwise.
+     * @return The one rendered Kubernetes object with the provided apiVersion, kind and name.
      * @throws java.lang.IllegalArgumentException if either zero or more than one Kubernetes object match.
      *                                            Use {@link #findOne(java.util.function.Predicate)} if it's acceptable for no objects to match.
      *                                            Use {@link #findAll(java.util.function.Predicate)} if you have no strict expectations about how many objects match.
      */
     public KubernetesObject getOne(String apiVersion, String kind, String name) {
         return getOne(o -> o.getApiVersion().equals(apiVersion) && o.getKind().equals(kind) && name.equals(o.getMetadata().getName()));
+    }
+
+    /**
+     * @return The one rendered Kubernetes object with the provided apiVersion, kind and name, and casts it to the provided KubernetesObject subtype.
+     * @throws java.lang.IllegalArgumentException if either zero or more than one Kubernetes object match.
+     *                                            Use {@link #findOne(java.util.function.Predicate)} if it's acceptable for no objects to match.
+     *                                            Use {@link #findAll(java.util.function.Predicate)} if you have no strict expectations about how many objects match.
+     */
+    public <T extends KubernetesObject> T getOne(String apiVersion, String kind, String name, Class<T> clazz) {
+        return clazz.cast(getOne(apiVersion, kind, name));
+    }
+
+    // Not intended to be exhaustive.
+    // Decorate Manifests to get a more exhaustive interface.
+
+    public V1Deployment getDeployment(String name) {
+        return getOne("apps/v1", "Deployment", name, V1Deployment.class);
+    }
+
+    public V1StatefulSet getStatefulSet(String name) {
+        return getOne("apps/v1", "StatefulSet", name, V1StatefulSet.class);
+    }
+
+    public V1Job getJob(String name) {
+        return getOne("batch/v1", "Job", name, V1Job.class);
+    }
+
+    public V1Ingress getIngress(String name) {
+        return getOne("networking.k8s.io/v1", "Ingress", name, V1Ingress.class);
+    }
+
+    public V1Service getService(String name) {
+        return getOne("v1", "Service", name, V1Service.class);
+    }
+
+    public V1ServiceAccount getServiceAccount(String name) {
+        return getOne("v1", "ServiceAccount", name, V1ServiceAccount.class);
+    }
+
+    public V1ConfigMap getConfigMap(String name) {
+        return getOne("v1", "ConfigMap", name, V1ConfigMap.class);
+    }
+
+    public String getConfigMapValue(String configMapName, String dataKey) {
+        var dataMap = Objects.requireNonNull(getConfigMap(configMapName).getData(),
+            "ConfigMap " + configMapName + " has no data");
+        return Objects.requireNonNull(dataMap.get(dataKey), "ConfigMap " + configMapName + " has no data under key " + dataKey);
+    }
+
+    public V1Secret getSecret(String name) {
+        return getOne("v1", "Secret", name, V1Secret.class);
+    }
+
+    public String getSecretValue(String secretName, String dataKey) {
+        var dataMap = Objects.requireNonNull(getSecret(secretName).getData(),
+            "Secret " + secretName + " has no data");
+        var data = Objects.requireNonNull(dataMap.get(dataKey), "Secret " + secretName + " has no data under key " + dataKey);
+        return new String(data, Charsets.UTF_8);
+    }
+
+    public V1PersistentVolumeClaim getPersistentVolumeClaim(String name) {
+        return getOne("v1", "PersistentVolumeClaim", name, V1PersistentVolumeClaim.class);
     }
 }
