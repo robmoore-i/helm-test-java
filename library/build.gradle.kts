@@ -44,25 +44,30 @@ mavenPublishing {
     publishToMavenCentral()
     signAllPublications()
 
-    coordinates("com.rrmoore", "helm-test-java", "0.4.0-SNAPSHOT")
+    coordinates("com.rrmoore", "helm-test-java", "1.0")
     pom {
-        name.set("Helm Test Java")
-        description.set("A library for writing automated tests for Helm charts")
-        inceptionYear.set("2025")
-        url.set("https://github.com/robmoore-i/helm-test-java")
+        name = "Helm Test Java"
+        description = "A library for writing automated tests for Helm charts"
+        inceptionYear = "2025"
+        url = "https://github.com/robmoore-i/helm-test-java"
         licenses {
             license {
-                name.set("The Apache License, Version 2.0")
-                url.set("https://www.apache.org/licenses/LICENSE-2.0.txt")
-                distribution.set("https://www.apache.org/licenses/LICENSE-2.0.txt")
+                name = "The Apache License, Version 2.0"
+                url = "https://www.apache.org/licenses/LICENSE-2.0.txt"
+                distribution = "https://www.apache.org/licenses/LICENSE-2.0.txt"
             }
         }
         developers {
             developer {
-                name.set("Rob Moore")
-                url.set("https://github.com/robmoore-i")
-                email.set("robmoore121@gmail.com")
+                name = "Rob Moore"
+                url = "https://github.com/robmoore-i"
+                email = "robmoore121@gmail.com"
             }
+        }
+        scm {
+            url = "https://github.com/robmoore-i/helm-test-java"
+            connection = "scm:git:git://github.com/robmoore-i/helm-test-java.git"
+            developerConnection = "scm:git:ssh://git@github.com/robmoore-i/helm-test-java.git"
         }
     }
 }
