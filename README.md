@@ -63,11 +63,42 @@ public class MyAppHelmChartTest {
 
 The `com.rrmoore.gradle.helm-test-java` Gradle plugin downloads the chosen version of the Helm executable from the default Helm public artifact repository and makes it available to your test code via the system property "com.rrmoore.helm.test.executable.path".
 
-If you know where your `helm` binary is on all the machines where your build runs (e.g. on CI, on each developer's machine), then you can set it yourself:
+To configure the version you want to use, configure the `helmToolchain` extension:
 
 ```
-tasks.test {
-    systemProperty("com.rrmoore.helm.test.executable.path", "/path/to/helm")
+plugins {
+    id("com.rrmoore.gradle.helm-test-java") version "1.0"
+}
+
+helmToolchain {
+    helmVersion = "4.0.4"
+}
+```
+
+The plugin will guess the platform (i.e. OS and CPU architecture) for the Helm binary to download, based on the JVM system properties "os.name" and "os.arch", however you can also override this or perform your own calculation to determine the platform:
+
+```
+import com.rrmoore.gradle.helm.test.PlatformIdentifier
+
+plugins {
+    id("com.rrmoore.gradle.helm-test-java") version "1.0"
+}
+
+helmToolchain {
+    helmVersion = "4.0.4"
+    helmPlatform = PlatformIdentifier.LINUX_AMD64
+}
+```
+
+If you know where your `helm` binary is on all the machines where your build runs (e.g. on CI, on each developer's machine), then you can set its path directly, meaning the plugin will make no attempt to download a Helm binary from the internet:
+
+```
+plugins {
+    id("com.rrmoore.gradle.helm-test-java") version "1.0"
+}
+
+helmToolchain {
+    helmExecutable = File("/path/to/helm")
 }
 ```
 
