@@ -35,7 +35,7 @@ testing {
         named<JvmTestSuite>("test") {
             useJUnitJupiter()
             dependencies {
-                implementation("com.rrmoore:helm-test-java:0.3.0-SNAPSHOT")
+                implementation("com.rrmoore:helm-test-java:0.4.0-SNAPSHOT")
             }
             targets {
                 all {

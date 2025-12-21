@@ -8,7 +8,7 @@ public class MinimalValuesTest {
     private final HelmExecutor helm = new GymRegisterHelmExecutor();
 
     @Test
-    void rendersWithNoValues() {
-        var manifests = helm.template();
+    void rendersSuccessfullyWithNoValues() {
+        helm.template();
     }
 }

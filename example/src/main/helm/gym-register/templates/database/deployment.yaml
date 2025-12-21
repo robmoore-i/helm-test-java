@@ -5,7 +5,7 @@ metadata:
   labels:
     app.kubernetes.io/name: gym-register-database
 spec:
-  replicas: {{ .Values.replicas | default 1 }}
+  replicas: 1
   selector:
     matchLabels:
       app.kubernetes.io/name: gym-register-database
@@ -17,8 +17,8 @@ spec:
       serviceAccountName: gym-register-database
       containers:
         - name: main
-          image: {{ include "gymregister.image.name" (dict "name" "gym-register-database") }}
-          imagePullPolicy: {{ .Values.image.imagePullPolicy | default "IfNotPresent" }}
+          image: {{ include "gymregister.image.name" (dict "name" "gym-register-database" "Chart" .Chart) }}
+          imagePullPolicy: {{ (.Values.image).imagePullPolicy | default "IfNotPresent" }}
           env:
           - name: POSTGRES_PASSWORD
             valueFrom:

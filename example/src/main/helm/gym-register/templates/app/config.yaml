@@ -3,4 +3,4 @@ kind: ConfigMap
 metadata:
   name: gym-register-app-config
 data:
-  allowWalkIns: {{ eq .Values.gymRegisterApp.walkInPolicy "allow" | quote }}
+  allowWalkIns: {{ eq (.Values.gymRegisterApp).walkInPolicy "allow" | quote }}
