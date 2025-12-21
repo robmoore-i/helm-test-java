@@ -36,13 +36,7 @@ testing {
             useJUnitJupiter()
             dependencies {
                 implementation("com.rrmoore:helm-test-java:0.4.0-SNAPSHOT")
-            }
-            targets {
-                all {
-                    testTask {
-                        systemProperty("helm.chart.path", layout.projectDirectory.dir("src/main/helm/gym-register").asFile.path)
-                    }
-                }
+                implementation("org.hamcrest:hamcrest:3.0")
             }
         }
     }

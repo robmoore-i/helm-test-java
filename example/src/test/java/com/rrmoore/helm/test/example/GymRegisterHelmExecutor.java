@@ -6,6 +6,6 @@ import java.io.File;
 public class GymRegisterHelmExecutor extends HelmExecutor {
 
     public GymRegisterHelmExecutor() {
-        super(new File(System.getProperty("helm.chart.path")));
+        super(new File("src/main/helm/gym-register"));
     }
 }
