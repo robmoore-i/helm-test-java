@@ -3,6 +3,7 @@
 
 plugins {
     java
+    `java-library`
     `jvm-test-suite`
     id("com.rrmoore.gradle.helm-test-java")
     id("com.vanniktech.maven.publish") version "0.35.0"
@@ -19,7 +20,9 @@ java {
 }
 
 dependencies {
-    implementation("io.kubernetes:client-java:25.0.0")
+    // Unfortunately there is no package that just exports the ability to parse the models,
+    // so we drag in the whole Java client. Not the end of the world.
+    api("io.kubernetes:client-java:25.0.0")
 }
 
 testing {
@@ -41,7 +44,7 @@ mavenPublishing {
     publishToMavenCentral()
     signAllPublications()
 
-    coordinates("com.rrmoore", "helm-test-java", "0.3.0-SNAPSHOT")
+    coordinates("com.rrmoore", "helm-test-java", "0.4.0-SNAPSHOT")
     pom {
         name.set("Helm Test Java")
         description.set("A library for writing automated tests for Helm charts")
