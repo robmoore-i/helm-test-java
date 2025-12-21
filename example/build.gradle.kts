@@ -27,7 +27,7 @@ repositories {
 }
 
 helmToolchain {
-    helmVersion = "3.19.4"
+    helmVersion = "4.0.4"
 }
 
 testing {
