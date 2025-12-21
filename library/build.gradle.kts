@@ -26,6 +26,9 @@ testing {
     suites {
         val test by getting(JvmTestSuite::class) {
             useJUnitJupiter()
+            dependencies {
+                implementation("org.hamcrest:hamcrest:3.0")
+            }
         }
     }
 }

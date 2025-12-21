@@ -5,6 +5,8 @@ import java.io.File;
 import java.util.List;
 import org.junit.jupiter.api.Test;
 
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.containsString;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @SuppressWarnings("DataFlowIssue")
@@ -66,7 +68,7 @@ public class HelmExecutorTest {
             """;
 
         var error = helm.templateError(values);
-        assert error.contains("Don't use the VeryBad image pull policy!");
+        assertThat(error, containsString("Don't use the VeryBad image pull policy!"));
     }
 
     @Test
@@ -80,6 +82,6 @@ public class HelmExecutorTest {
             """;
 
         var error = helm.templateError(List.of(valuesA, valuesB));
-        assert error.contains("Don't use the VeryBad image pull policy!");
+        assertThat(error, containsString("Don't use the VeryBad image pull policy!"));
     }
 }
