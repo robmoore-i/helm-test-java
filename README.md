@@ -2,11 +2,7 @@
 
 A library for writing automated tests for Helm charts, so that you can have a great developer experience while working on them.
 
-#### The initial release is still in a work in progress, as indicated by the below TODO.
-
-TODO:
-- Release library as 1.0.
-- Publish the plugin to the Gradle plugin portal as 1.0.
+**_Note: The plugin is not yet published to the Gradle plugin portal._**
 
 ## Usage example
 
