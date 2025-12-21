@@ -1,5 +1,6 @@
 package com.rrmoore.helm.test;
 
+import com.rrmoore.helm.test.jdkext.Exceptions;
 import io.kubernetes.client.openapi.models.V1Deployment;
 import java.io.File;
 import java.util.List;
@@ -83,5 +84,40 @@ public class HelmExecutorTest {
 
         var error = helm.templateError(List.of(valuesA, valuesB));
         assertThat(error, containsString("Don't use the VeryBad image pull policy!"));
+    }
+
+    @Test
+    void showsUnexpectedTemplateErrors() {
+        var values = """
+            image:
+              pullPolicy: VeryBad
+            """;
+
+        try {
+            helm.template(values);
+            assert false : "Expected an Exception to be thrown, but none was";
+        } catch (Exception e) {
+            assertThat(e.getMessage(), containsString("Don't use the VeryBad image pull policy!"));
+        }
+    }
+
+    @Test
+    void recordsRenderedManifestsFromUnexpectedTemplateSuccess() {
+        Manifests manifests = null;
+
+        try {
+            helm.templateError("replicas: 1");
+            assert false : "Expected an Exception to be thrown, but none was";
+        } catch (Exception e) {
+            var prefix = "Manifests written to file '";
+            var index = e.getMessage().indexOf(prefix) + prefix.length();
+            var fileName = e.getMessage().substring(index, e.getMessage().length() - 1);
+            var file = new File(fileName);
+            assert file.isFile() : "File " + fileName + " either is not a valid file path or does not exist.";
+            manifests = Exceptions.uncheck(() -> Manifests.fromYaml(file.toPath()));
+        }
+
+        var deployment = (V1Deployment) manifests.getOne("apps/v1", "Deployment", "my-app");
+        assertEquals("IfNotPresent", deployment.getSpec().getTemplate().getSpec().getContainers().getFirst().getImagePullPolicy());
     }
 }

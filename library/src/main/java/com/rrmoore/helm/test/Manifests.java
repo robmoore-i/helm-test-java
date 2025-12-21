@@ -1,5 +1,6 @@
 package com.rrmoore.helm.test;
 
+import com.rrmoore.helm.test.jdkext.Exceptions;
 import io.kubernetes.client.common.KubernetesObject;
 import io.kubernetes.client.openapi.models.V1ConfigMap;
 import io.kubernetes.client.openapi.models.V1Deployment;
@@ -10,6 +11,11 @@ import io.kubernetes.client.openapi.models.V1Secret;
 import io.kubernetes.client.openapi.models.V1Service;
 import io.kubernetes.client.openapi.models.V1ServiceAccount;
 import io.kubernetes.client.openapi.models.V1StatefulSet;
+import io.kubernetes.client.util.Yaml;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -28,6 +34,26 @@ public class Manifests {
 
     public Manifests(List<KubernetesObject> renderedObjects) {
         this.renderedObjects = renderedObjects;
+    }
+
+    /**
+     * @param yaml A YAML string representing any number of Kubernetes objects.
+     * @return An instance of Manifests representing the Kubernetes objects defined in the provided YAML.
+     */
+    public static Manifests fromYaml(String yaml) {
+        var renderedObjects = Arrays.stream(yaml.split("---"))
+            .skip(1)
+            .map(kubernetesResourceYaml -> Exceptions.uncheck(() -> (KubernetesObject) Yaml.load(kubernetesResourceYaml)))
+            .toList();
+        return new Manifests(renderedObjects);
+    }
+
+    /**
+     * @param path A YAML file containing any number of Kubernetes objects.
+     * @return An instance of Manifests representing the Kubernetes objects defined in the provided YAML file.
+     */
+    public static Manifests fromYaml(Path path) throws IOException {
+        return fromYaml(Files.readString(path));
     }
 
     /**

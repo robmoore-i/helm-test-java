@@ -1,8 +1,6 @@
 package com.rrmoore.helm.test;
 
 import com.rrmoore.helm.test.jdkext.Exceptions;
-import io.kubernetes.client.common.KubernetesObject;
-import io.kubernetes.client.util.Yaml;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
@@ -10,9 +8,9 @@ import java.nio.file.Files;
 import java.time.Duration;
 import java.time.Instant;
 import java.time.ZoneOffset;
+import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 import java.util.function.Function;
@@ -27,6 +25,7 @@ public class HelmExecutor {
     private final File chart;
 
     private final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("uuuuMMddHHmmss");
+    private final ZonedDateTime initTimestamp = Instant.now().atZone(ZoneOffset.UTC);
 
     /**
      * Creates a Helm executor, determining the path to the Helm executable file using a JVM system property,
@@ -114,7 +113,7 @@ public class HelmExecutor {
     }
 
     private List<String> templateValuesArgs(List<String> valuesYamls) {
-        var timestamp = formatter.format(Instant.now().atZone(ZoneOffset.UTC));
+        var timestamp = formatter.format(initTimestamp);
         return valuesYamls.stream()
             .flatMap(valuesYaml -> {
                 var valuesFile = Exceptions.uncheck(() -> File.createTempFile("helm-test-values-yaml-" + timestamp + "-", ".yaml"));
@@ -128,39 +127,62 @@ public class HelmExecutor {
         var helmArgs = new ArrayList<>(List.of("template", chart.getAbsolutePath()));
         helmArgs.addAll(args);
         var output = executeHelmForOutput(helmArgs);
-        var renderedObjects = Arrays.stream(output.split("---"))
-            .skip(1)
-            .map(yaml -> Exceptions.uncheck(() -> (KubernetesObject) Yaml.load(yaml)))
-            .toList();
-        return new Manifests(renderedObjects);
+        return Manifests.fromYaml(output);
     }
 
     private String executeHelmForOutput(List<String> args) {
-        return executeHelm(args, Process::inputReader, true);
+        return executeHelm(args, Process::inputReader, true).stdout();
     }
 
     private String executeHelmForError(List<String> args) {
-        return executeHelm(args, Process::errorReader, false);
+        return executeHelm(args, Process::errorReader, false).stderr();
     }
 
-    private String executeHelm(List<String> args, Function<Process, BufferedReader> processReader, boolean expectSuccess) {
+    private StdProcessOutput executeHelm(List<String> args, Function<Process, BufferedReader> processReader, boolean expectSuccess) {
         var command = new ArrayList<>(List.of(helmExecutable.getAbsolutePath()));
         command.addAll(args);
+        BufferedReader inputReader = null;
+        BufferedReader errorReader = null;
         try {
             var process = new ProcessBuilder(command).start();
-            process.waitFor(Duration.ofSeconds(1));
-            try (BufferedReader bufferedReader = processReader.apply(process)) {
-                var output = String.join("\n", bufferedReader.readAllLines());
-                int exitCode = process.exitValue();
-                if (exitCode != 0 && expectSuccess) {
-                    throw new RuntimeException("Command '" + String.join(" ", command) + "' finished with exit code " + exitCode + ".");
-                } else if (exitCode == 0 && !expectSuccess) {
-                    throw new RuntimeException("Command '" + String.join(" ", command) + "' unexpectedly finished with exit code 0.");
-                }
-                return output;
+            process.waitFor(Duration.ofSeconds(10));
+            inputReader = process.inputReader();
+            errorReader = process.errorReader();
+            var stdout = String.join("\n", inputReader.readAllLines());
+            var stderr = String.join("\n", errorReader.readAllLines());
+            inputReader.close();
+            errorReader.close();
+
+            int exitCode = process.exitValue();
+            if (exitCode != 0 && expectSuccess) {
+                throw new RuntimeException("Command '" + String.join(" ", command) + "' finished with exit code " + exitCode + ". Error output: " + stderr);
+            } else if (exitCode == 0 && !expectSuccess) {
+                var timestamp = formatter.format(initTimestamp);
+                var unexpectedManifests = Exceptions.uncheck(() -> File.createTempFile("helm-test-unexpected-success-" + timestamp + "-", ".yaml"));
+                Exceptions.uncheck(() -> Files.writeString(unexpectedManifests.toPath(), stdout));
+                throw new RuntimeException("Command '" + String.join(" ", command) + "' unexpectedly finished with exit code 0. Manifests written to file '" + unexpectedManifests.getAbsolutePath() + "'");
             }
+
+            return new StdProcessOutput(stdout, stderr);
         } catch (IOException | InterruptedException e) {
+            try {
+                if (inputReader != null) {
+                    inputReader.close();
+                }
+            } catch (IOException ie) {
+                e.addSuppressed(ie);
+            }
+            try {
+                if (errorReader != null) {
+                    errorReader.close();
+                }
+            } catch (IOException ie) {
+                e.addSuppressed(ie);
+            }
             throw new RuntimeException("Helm execution failed for command '" + String.join(" ", command) + "'", e);
         }
+    }
+
+    private record StdProcessOutput(String stdout, String stderr) {
     }
 }
