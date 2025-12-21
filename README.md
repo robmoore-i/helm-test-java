@@ -10,7 +10,7 @@ TODO:
 
 ## Usage example
 
-This example assumes the use of the `com.rrmoore.gradle.helm-test-java` to put the `helm` binary in the location expected by the `HelmExecutor` one-argument constructor.
+This example assumes the use of the `com.rrmoore.gradle.helm-test-java` to pass the location of the `helm` executable to the Java process for use by the library.
 
 ```
 package com.rrmoore.helm.test.example.app;
@@ -61,9 +61,13 @@ public class MyAppHelmChartTest {
 
 ## The `helm-test-java` Gradle plugin
 
-The `com.rrmoore.gradle.helm-test-java` Gradle plugin downloads the chosen version of the Helm executable from the default Helm public artifact repository and makes it available to your test code via the system property "com.rrmoore.helm.test.executable.path".
+The `com.rrmoore.gradle.helm-test-java` Gradle plugin optionally downloads the chosen version of the Helm executable from the default Helm public artifact repository and makes it available to your test code via the system property "com.rrmoore.helm.test.executable.path". It can also make the path of a known local `helm` executable available to your test code via the same means, without downloading anything.
 
-To configure the version you want to use, configure the `helmToolchain` extension:
+You can configure the plugin by using the `helmToolchain` extension.
+
+### Downloading a Helm version from the internet
+
+To configure the Helm version to download, set `helmVersion`:
 
 ```
 plugins {
@@ -89,6 +93,8 @@ helmToolchain {
     helmPlatform = PlatformIdentifier.LINUX_AMD64
 }
 ```
+
+### Using a local `helm` executable
 
 If you know where your `helm` binary is on all the machines where your build runs (e.g. on CI, on each developer's machine), then you can set its path directly, meaning the plugin will make no attempt to download a Helm binary from the internet:
 
@@ -147,3 +153,9 @@ testing {
     }
 }
 ```
+
+### Advanced setup
+
+#### Without using the `helm-test-java` Gradle plugin
+
+There is a constructor of `HelmExecutor` that doesn't make use of the "com.rrmoore.helm.test.executable.path" system property. You should use this constructor if you want to use the library without using the Gradle plugin.
