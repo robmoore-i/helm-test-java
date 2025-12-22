@@ -17,3 +17,9 @@ bash private/release/library/publish-promoted-release.sh
 ```
 bash private/release/plugin/publish.sh
 ```
+
+## Post-release
+
+- Edit and finalize the release notes in the `release-notes` directory, move them to `release-notes/released`, and then create a new file for the next release `release-notes/helm-test-java-<version>.md`.
+- Use the just-released version number in the examples in `README.md`.
+- Use the just-released version number in the `example` project.

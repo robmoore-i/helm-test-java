@@ -155,3 +155,11 @@ testing {
 #### Without using the `helm-test-java` Gradle plugin
 
 There is a constructor of `HelmExecutor` that doesn't make use of the "com.rrmoore.helm.test.executable.path" system property. You should use this constructor if you want to use the library without using the Gradle plugin.
+
+## Request features or report bugs
+
+Please create a GitHub issue.
+
+## Contribute
+
+Go for it! There isn't much code.
