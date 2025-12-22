@@ -2,6 +2,7 @@ plugins {
     `java-gradle-plugin`
     id("org.jetbrains.kotlin.jvm") version "2.2.0"
     id("com.gradle.plugin-publish") version "2.0.0"
+    signing
 }
 
 version = "1.0"
@@ -29,4 +30,11 @@ gradlePlugin {
             tags.set(listOf("helm", "chart", "kubernetes", "test", "tests", "testing"))
         }
     }
+}
+
+signing {
+    val signingKeyId: String? by project
+    val signingKey: String? by project
+    val signingPassword: String? by project
+    useInMemoryPgpKeys(signingKeyId, signingKey, signingPassword)
 }

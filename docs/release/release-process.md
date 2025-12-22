@@ -1,13 +1,19 @@
 # Release process
 
-```
-bash private/release/publish-snapshot-release.sh
-```
+## Library
 
-See `example/` for an example of a project that uses a published snapshot. 
+```
+bash private/release/library/publish-snapshot-release.sh
+```
 
 Alternatively,
 
 ```
-bash private/release/publish-promoted-release.sh
+bash private/release/library/publish-promoted-release.sh
+```
+
+## Plugin
+
+```
+bash private/release/plugin/publish.sh
 ```
