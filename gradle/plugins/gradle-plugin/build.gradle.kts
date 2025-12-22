@@ -4,7 +4,7 @@ plugins {
     id("com.gradle.plugin-publish") version "2.0.0"
 }
 
-version = "0.1.0"
+version = "1.0"
 group = "com.rrmoore.gradle"
 
 repositories {
@@ -25,7 +25,7 @@ gradlePlugin {
             id = "com.rrmoore.gradle.helm-test-java"
             implementationClass = "com.rrmoore.gradle.helm.test.HelmTestJavaPlugin"
             displayName = "Helm Test plugin"
-            description = "Write automated tests for Helm charts."
+            description = "Companion Gradle plugin for the helm-test-java library. When applied, this plugin downloads and unpacks a `helm` executable for use in your build."
             tags.set(listOf("helm", "chart", "kubernetes", "test", "tests", "testing"))
         }
     }
