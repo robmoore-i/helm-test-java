@@ -19,7 +19,7 @@ java {
 }
 
 gradlePlugin {
-    website.set("https://robmoore-i.github.io")
+    website.set("https://github.com/robmoore-i/helm-test-java")
     vcsUrl.set("https://github.com/robmoore-i/helm-test-java")
     plugins {
         create("helmTestJavaPlugin") {
