@@ -1,7 +1,7 @@
 # Helm Test Java
 
 A library for writing automated tests for Helm charts, so that you can have a great developer experience while working on them.
-There is also a companion Gradle plugin to further streamline the experience.
+There is a companion Gradle plugin to manage the Helm toolchain you use for tests.
 
 ## Usage example
 
