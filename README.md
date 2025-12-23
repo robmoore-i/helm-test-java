@@ -1,14 +1,13 @@
 # Helm Test Java
 
 A library for writing automated tests for Helm charts, so that you can have a great developer experience while working on them.
-
-**_Note: The plugin is not yet published to the Gradle plugin portal._**
+There is also a companion Gradle plugin to further streamline the experience.
 
 ## Usage example
 
 This example assumes the use of the `com.rrmoore.gradle.helm-test-java` Gradle plugin to pass the location of the `helm` executable to the Java process for use by the library.
 
-```
+```java
 package com.rrmoore.helm.test.example.app;
 
 import com.rrmoore.helm.test.HelmExecutor;
@@ -18,39 +17,49 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsString;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-public class MyAppHelmChartTest {
+public class SantaSleighHelmChartTest {
 
-    private final HelmExecutor helm = new HelmExecutor(new File("src/main/helm/my-app"));
+    private final HelmExecutor helm = new HelmExecutor(new File("src/main/helm/santa-sleigh"));
 
+    // Run `helm template` and read values using the 
+    // official Kubernetes Java client's model classes. 
     @Test
-    void someFeatureConfigIsSetToFooByDefault() {
+    void rudolphIsIncludedByDefault() {
         var manifests = helm.template();
 
-        assertEquals("foo", manifests.getConfigMapValue("my-app-config", "someFeature"));
+        assertEquals("9", manifests.getConfigMapValue("sleigh-config", "numberOfReindeer"));
     }
 
+    // Pass different combinations of values YAML to `helm template` 
+    // to see how the templates are rendered in different conditional branches.
     @Test
-    void canDisableSomeFeature() {
+    void rudolphCanBeRestedUsingFlag() {
         var values = """
-            someFeature:
-              mode: disabled
+            sleigh:
+              rudolph:
+                enabled: false
             """;
 
         var manifests = helm.template(values);
 
-        assertEquals("disabled", manifests.getConfigMapValue("gym-register-app-config", "someFeature"));
+        assertEquals("9", manifests.getConfigMapValue("sleigh-config", "numberOfReindeer"));
+        assertEquals("headlamp", manifests.getConfigMapValue("sleigh-config", "lightSource"));
     }
 
+    // Use test-driven development to implement powerful semantic input verifications
+    // which ensure that renderings are semantically coherent and correct.
     @Test
-    void failsIfUnknownValueSpecified() {
+    void cannotUseRudolphsShinyNoseIfHeIsNotOnTheSleigh() {
         var values = """
-            someFeature:
-              mode: jibberish
+            sleigh:
+              rudolph:
+                enabled: false
+              lightSource: rudolph
             """;
 
         var error = helm.templateError(values);
 
-        assertThat(error, containsString("Unrecognised someFeature mode 'jibberish'. Set someFeature.mode to one of [foo disabled] and try again."));
+        assertThat(error, containsString("Cannot use Rudolph's shiny nose as the sleigh's light source if he isn't on the sleigh."));
     }
 }
 ```
@@ -162,4 +171,4 @@ Please create a GitHub issue.
 
 ## Contribute
 
-Go for it! There isn't much code.
+Go for it! There isn't much code so it shouldn't be too hard. Alternatively, make a GitHub issue describing what you need.
