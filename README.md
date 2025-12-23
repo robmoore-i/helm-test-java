@@ -5,8 +5,6 @@ There is a companion Gradle plugin to manage the Helm toolchain you use for test
 
 ## Usage example
 
-This example assumes the use of the `com.rrmoore.gradle.helm-test-java` Gradle plugin to pass the location of the `helm` executable to the Java process for use by the library.
-
 ```java
 package com.rrmoore.helm.test.example.app;
 
@@ -64,6 +62,8 @@ public class SantaSleighHelmChartTest {
 }
 ```
 
+The above example assumes the use of the `com.rrmoore.gradle.helm-test-java` Gradle plugin to pass the location of the `helm` executable to the Java process for use by the library.
+
 ## The `helm-test-java` Gradle plugin
 
 The `com.rrmoore.gradle.helm-test-java` Gradle plugin optionally downloads the chosen version of the Helm executable from the default Helm public artifact repository and makes it available to your test code via the system property "com.rrmoore.helm.test.executable.path". It can also make the path of a known local `helm` executable available to your test code via the same means, without downloading anything.
@@ -119,7 +119,7 @@ Below gives the copy & pastable Kotlin Gradle code.
 
 ### With the `java` plugin
 
-```
+```kotlin
 plugins {
     java
     `jvm-test-suite`
@@ -137,7 +137,7 @@ dependencies {
 
 ### With the `jvm-test-suite` plugin
 
-```
+```kotlin
 plugins {
     java
     `jvm-test-suite`
@@ -167,7 +167,7 @@ There is a constructor of `HelmExecutor` that doesn't make use of the "com.rrmoo
 
 ## Request features or report bugs
 
-Please create a GitHub issue.
+Please create a GitHub issue. There may already be an issue for the feature or bug fix you need, in which case the best thing you can do is give it a thumbs up and leave a comment on it.
 
 ## Contribute
 
