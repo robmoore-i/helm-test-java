@@ -1,5 +1,8 @@
 # Helm Test Java
 
+![Maven central](https://img.shields.io/maven-central/v/com.rrmoore/helm-test-java)
+![Gradle plugin portal](https://img.shields.io/gradle-plugin-portal/v/com.rrmoore.gradle.helm-test-java)
+
 A library for writing automated tests for Helm charts, so that you can have a great developer experience while working on them.
 There is a companion Gradle plugin to manage the Helm toolchain you use for tests.
 
