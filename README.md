@@ -6,7 +6,7 @@ A library for writing automated tests for Helm charts, so that you can have a gr
 
 ## Usage example
 
-This example assumes the use of the `com.rrmoore.gradle.helm-test-java` to pass the location of the `helm` executable to the Java process for use by the library.
+This example assumes the use of the `com.rrmoore.gradle.helm-test-java` Gradle plugin to pass the location of the `helm` executable to the Java process for use by the library.
 
 ```
 package com.rrmoore.helm.test.example.app;
