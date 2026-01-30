@@ -134,7 +134,7 @@ helmToolchain {
 }
 
 dependencies {
-    testImplementation("com.rrmoore:helm-test-java:1.1")
+    testImplementation("com.rrmoore:helm-test-java:1.1.1")
 }
 ```
 
@@ -155,7 +155,7 @@ testing {
     suites {
         named<JvmTestSuite>("test") {
             dependencies {
-                implementation("com.rrmoore:helm-test-java:1.1")
+                implementation("com.rrmoore:helm-test-java:1.1.1")
             }
         }
     }

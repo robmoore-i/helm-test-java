@@ -49,7 +49,7 @@ testing {
                 implementation("com.rrmoore:helm-test-java:1.2-SNAPSHOT")
 
                 // Stable version
-                // implementation("com.rrmoore:helm-test-java:1.1")
+                // implementation("com.rrmoore:helm-test-java:1.1.1")
             }
         }
     }
