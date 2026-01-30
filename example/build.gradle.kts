@@ -35,7 +35,7 @@ testing {
         named<JvmTestSuite>("test") {
             useJUnitJupiter()
             dependencies {
-                implementation("com.rrmoore:helm-test-java:1.0")
+                implementation("com.rrmoore:helm-test-java:1.1-SNAPSHOT")
                 implementation("org.hamcrest:hamcrest:3.0")
             }
         }
