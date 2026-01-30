@@ -1,12 +1,14 @@
-package com.rrmoore.helm.test.jdkext;
+package com.rrmoore.helm.test.internal.jdkext;
 
-import io.kubernetes.client.common.KubernetesObject;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 import org.yaml.snakeyaml.Yaml;
 
+/**
+ * A wrapper for YAML objects, intended to reduce the number of casts needed to access deeply nested elements.
+ */
 public class YamlMap {
 
     private static final Yaml SNAKE_YAML = new Yaml();

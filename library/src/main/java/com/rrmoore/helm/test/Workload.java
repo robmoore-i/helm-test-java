@@ -1,6 +1,6 @@
 package com.rrmoore.helm.test;
 
-import com.rrmoore.helm.test.jdkext.YamlMap;
+import com.rrmoore.helm.test.internal.jdkext.YamlMap;
 import io.kubernetes.client.openapi.models.V1Container;
 import io.kubernetes.client.util.Yaml;
 import java.util.ArrayList;

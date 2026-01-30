@@ -1,7 +1,7 @@
 package com.rrmoore.helm.test;
 
-import com.rrmoore.helm.test.jdkext.Exceptions;
-import com.rrmoore.helm.test.jdkext.YamlMap;
+import com.rrmoore.helm.test.internal.jdkext.Exceptions;
+import com.rrmoore.helm.test.internal.jdkext.YamlMap;
 import io.kubernetes.client.common.KubernetesObject;
 import io.kubernetes.client.openapi.models.V1ConfigMap;
 import io.kubernetes.client.openapi.models.V1Deployment;

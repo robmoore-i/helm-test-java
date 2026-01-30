@@ -1,5 +1,6 @@
-package com.rrmoore.helm.test.jdkext;
+package com.rrmoore.helm.test.internal.jdkext;
 
+import com.rrmoore.helm.test.internal.jdkext.YamlMap;
 import java.util.Optional;
 import org.junit.jupiter.api.Test;
 

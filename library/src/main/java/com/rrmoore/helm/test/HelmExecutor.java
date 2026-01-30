@@ -1,6 +1,6 @@
 package com.rrmoore.helm.test;
 
-import com.rrmoore.helm.test.jdkext.Exceptions;
+import com.rrmoore.helm.test.internal.jdkext.Exceptions;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;

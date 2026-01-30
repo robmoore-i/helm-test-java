@@ -1,6 +1,6 @@
 package com.rrmoore.helm.test;
 
-import com.rrmoore.helm.test.jdkext.Exceptions;
+import com.rrmoore.helm.test.internal.jdkext.Exceptions;
 import io.kubernetes.client.openapi.models.V1Deployment;
 import java.io.File;
 import java.util.List;

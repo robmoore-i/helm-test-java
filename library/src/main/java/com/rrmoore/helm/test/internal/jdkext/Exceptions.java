@@ -1,4 +1,4 @@
-package com.rrmoore.helm.test.jdkext;
+package com.rrmoore.helm.test.internal.jdkext;
 
 import java.util.function.Supplier;
 
