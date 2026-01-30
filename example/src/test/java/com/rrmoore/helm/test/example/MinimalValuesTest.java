@@ -5,6 +5,7 @@ import com.rrmoore.helm.test.Workload;
 import java.util.stream.Collectors;
 import org.junit.jupiter.api.Test;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class MinimalValuesTest {
@@ -17,7 +18,7 @@ public class MinimalValuesTest {
     }
 
     @Test
-    void everyWorkloadHasChecksumAnnotationsForItsResources() {
+    void checksumAnnotations() {
         var manifests = helm.template();
 
         var failures = manifests.findAllWorkloads().stream()
@@ -27,5 +28,19 @@ public class MinimalValuesTest {
             .collect(Collectors.joining("\n"));
 
         assertTrue(failures.isBlank(), failures);
+    }
+
+    @Test
+    void deterministicOutputIsConfigurable() {
+        var values = """
+            database:
+              credentials:
+                superuser:
+                  password: secret-password
+            """;
+        var manifestsA = helm.template(values);
+        var manifestsB = helm.template(values);
+
+        assertEquals(manifestsA, manifestsB);
     }
 }
