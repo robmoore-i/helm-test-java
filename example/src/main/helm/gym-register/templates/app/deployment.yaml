@@ -13,6 +13,8 @@ spec:
     metadata:
       labels:
         app.kubernetes.io/name: gym-register-app
+      annotations:
+        checksum/gym-register-app-config: {{ include (print $.Template.BasePath "/app/config.yaml") . | sha256sum }}
     spec:
       serviceAccountName: gym-register-app
       containers:
