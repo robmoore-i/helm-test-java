@@ -174,4 +174,4 @@ Please create a GitHub issue. There may already be an issue for the feature or b
 
 ## Contribute
 
-Go for it! There isn't much code so it shouldn't be too hard. Alternatively, make a GitHub issue describing what you need.
+Go for it! There isn't much code so it shouldn't be too hard. Alternatively, make a GitHub issue describing what you need and I'll have a look.
