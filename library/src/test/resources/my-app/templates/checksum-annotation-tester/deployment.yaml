@@ -13,18 +13,37 @@ spec:
     metadata:
       labels:
         app.kubernetes.io/name: checksum-annotation-tester
+      {{- if not (.Values.checksumAnnotationTest).noAnnotations }}
       annotations:
-        {{- if not .Values.checksumAnnotationTest.missingConfigMapAnnotation }}
+        {{- if not (.Values.checksumAnnotationTest).missingEnvConfigMapAnnotation }}
         checksum/checksum-annotation-tester-config: {{ include (print $.Template.BasePath "/checksum-annotation-tester/configmap.yaml") . | sha256sum }}
         {{- end }}
-        {{- if not .Values.checksumAnnotationTest.missingSecretAnnotation }}
+        {{- if not (.Values.checksumAnnotationTest).missingEnvSecretAnnotation }}
         checksum/checksum-annotation-tester-secret: {{ include (print $.Template.BasePath "/checksum-annotation-tester/secret.yaml") . | sha256sum }}
         {{- end }}
-        {{- if .Values.checksumAnnotationTest.unnecessaryExtraResourceAnnotation }}
+        {{- if not (.Values.checksumAnnotationTest).missingImagePullSecretAnnotation }}
+        checksum/my-registry-credentials: "imagepullsecret-checksum"
+        {{- end }}
+        {{- if not (.Values.checksumAnnotationTest).missingConfigMapVolumeAnnotation }}
+        checksum/volume-config: "volume-config-checksum"
+        {{- end }}
+        {{- if not (.Values.checksumAnnotationTest).missingSecretVolumeAnnotation }}
+        checksum/volume-secret: "volume-secret-checksum"
+        {{- end }}
+        {{- if not (.Values.checksumAnnotationTest).missingEnvFromConfigMapAnnotation }}
+        checksum/envfrom-config: "envfrom-config-checksum"
+        {{- end }}
+        {{- if not (.Values.checksumAnnotationTest).missingEnvFromSecretAnnotation }}
+        checksum/envfrom-secret: "envfrom-secret-checksum"
+        {{- end }}
+        {{- if (.Values.checksumAnnotationTest).unnecessaryExtraResourceAnnotation }}
         checksum/checksum-annotation-tester-extra-config: "unnecessary"
         {{- end }}
+      {{- end }}
     spec:
       serviceAccountName: checksum-annotation-tester
+      imagePullSecrets:
+        - name: my-registry-credentials
       containers:
         - name: main
           image: "nginx:1.16.0"
@@ -40,6 +59,11 @@ spec:
                 secretKeyRef:
                   name: checksum-annotation-tester-secret
                   key: password
+          envFrom:
+            - configMapRef:
+                name: envfrom-config
+            - secretRef:
+                name: envfrom-secret
           ports:
             - name: http
               containerPort: 80
@@ -52,3 +76,10 @@ spec:
             httpGet:
               path: /
               port: http
+      volumes:
+        - name: config-volume
+          configMap:
+            name: volume-config
+        - name: secret-volume
+          secret:
+            secretName: volume-secret
