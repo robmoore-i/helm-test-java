@@ -30,13 +30,26 @@ helmToolchain {
     helmVersion = "4.0.4"
 }
 
+configurations.all {
+    resolutionStrategy {
+        cacheChangingModulesFor(0, TimeUnit.SECONDS)
+    }
+}
+
 testing {
     suites {
         named<JvmTestSuite>("test") {
             useJUnitJupiter()
             dependencies {
-                implementation("com.rrmoore:helm-test-java:1.1-SNAPSHOT")
                 implementation("org.hamcrest:hamcrest:3.0")
+
+                // Snapshot version
+                // Note: You need to use the 'refresh dependencies' feature of Gradle/IDEA
+                //       when updating the snapshot if you upload one during development.
+                implementation("com.rrmoore:helm-test-java:1.1-SNAPSHOT")
+
+                // Stable version
+                // implementation("com.rrmoore:helm-test-java:1.0")
             }
         }
     }
