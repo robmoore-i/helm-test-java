@@ -1,0 +1,54 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: checksum-annotation-tester
+  labels:
+    app.kubernetes.io/name: checksum-annotation-tester
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: checksum-annotation-tester
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: checksum-annotation-tester
+      annotations:
+        {{- if not .Values.checksumAnnotationTest.missingConfigMapAnnotation }}
+        checksum/checksum-annotation-tester-config: {{ include (print $.Template.BasePath "/checksum-annotation-tester/configmap.yaml") . | sha256sum }}
+        {{- end }}
+        {{- if not .Values.checksumAnnotationTest.missingSecretAnnotation }}
+        checksum/checksum-annotation-tester-secret: {{ include (print $.Template.BasePath "/checksum-annotation-tester/secret.yaml") . | sha256sum }}
+        {{- end }}
+        {{- if .Values.checksumAnnotationTest.unnecessaryExtraResourceAnnotation }}
+        checksum/checksum-annotation-tester-extra-config: "unnecessary"
+        {{- end }}
+    spec:
+      serviceAccountName: checksum-annotation-tester
+      containers:
+        - name: main
+          image: "nginx:1.16.0"
+          imagePullPolicy: "Always"
+          env:
+            - name: BUCKET_NAME
+              valueFrom:
+                configMapKeyRef:
+                  name: checksum-annotation-tester-config
+                  key: bucketName
+            - name: APP_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: checksum-annotation-tester-secret
+                  key: password
+          ports:
+            - name: http
+              containerPort: 80
+              protocol: TCP
+          livenessProbe:
+            httpGet:
+              path: /
+              port: http
+          readinessProbe:
+            httpGet:
+              path: /
+              port: http

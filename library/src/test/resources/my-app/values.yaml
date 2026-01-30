@@ -2,3 +2,8 @@
 replicas: 1
 image:
   pullPolicy: IfNotPresent
+
+checksumAnnotationTest:
+  missingConfigMapAnnotation: false
+  missingSecretAnnotation: false
+  unnecessaryExtraResourceAnnotation: false
