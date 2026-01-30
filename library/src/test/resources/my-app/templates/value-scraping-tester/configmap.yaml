@@ -1,0 +1,16 @@
+# Test template for edge cases in value parsing
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: edge-cases
+data:
+  # Multiple values of different forms on one line
+  combined: "{{ .Values.edge.first }}-{{ (.Values.edge).second }}"
+  # Deeply nested value
+  deep: {{ .Values.deeply.nested.value.here }}
+  # Value with underscore
+  underscore: {{ .Values.with_underscore }}
+  # Value with number
+  numbered: {{ .Values.config2.enabled }}
+  # Parenthesized form with deeper nesting
+  paren: {{ if (.Values.edge).useFeature }}enabled{{ end }}

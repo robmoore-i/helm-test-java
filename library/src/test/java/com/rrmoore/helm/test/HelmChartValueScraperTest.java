@@ -1,0 +1,36 @@
+package com.rrmoore.helm.test;
+
+import java.io.File;
+import java.util.Set;
+import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
+class HelmChartValueScraperTest {
+
+    @Test
+    void scrapesValuesFromTemplates() {
+        var scraper = new HelmChartValueScraper();
+        var values = scraper.readValues(new File("src/test/resources/my-app"));
+        assertEquals(Set.of(
+            "checksumAnnotationTest.missingConfigMapVolumeAnnotation",
+            "checksumAnnotationTest.missingEnvConfigMapAnnotation",
+            "checksumAnnotationTest.missingEnvFromConfigMapAnnotation",
+            "checksumAnnotationTest.missingEnvFromSecretAnnotation",
+            "checksumAnnotationTest.missingEnvSecretAnnotation",
+            "checksumAnnotationTest.missingImagePullSecretAnnotation",
+            "checksumAnnotationTest.missingSecretVolumeAnnotation",
+            "checksumAnnotationTest.noAnnotations",
+            "checksumAnnotationTest.unnecessaryExtraResourceAnnotation",
+            "config2.enabled",
+            "deeply.nested.value.here",
+            "edge.first",
+            "edge.second",
+            "edge.useFeature",
+            "equalityTesting.useRandomSecret",
+            "image.pullPolicy",
+            "replicas",
+            "with_underscore"
+        ), values);
+    }
+}
