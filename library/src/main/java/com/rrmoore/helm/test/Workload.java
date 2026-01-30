@@ -44,21 +44,7 @@ public class Workload {
      * Verifies that the workload has the correct set of checksum annotations to ensure that its pods will be cycled
      * whenever a ConfigMap or Secret they reference is changed.
      * <p>
-     * First, this method finds every ConfigMap or Secret referenced by the workload in all its containers' env
-     * and imagePullSecret, and all the workload's volumes that are created from a ConfigMap or Secret.
-     * This set of resources is then compared to the set of annotations defined by the workload under
-     * spec.template.metadata.annotations. This method verifies that every referenced resource has a corresponding
-     * checksum annotation i.e. there exists an annotation whose name contains both "checksum" and the name of the resource.
-     * Furthermore, if there are any checksum annotations which don't contain the name of any referenced resource, they
-     * are unnecessary - these are also recorded by the return value of this method.
-     * <p>
-     * If any resource is referenced but does not have a corresponding checksum annotation, the returned result will include
-     * a message describing what's missing.
-     * If any checksum annotation exists without a corresponding referenced resource, the return result's message will include
-     * a message describing what's extraneous.
-     * It may be that a workload has both missing and extraneous checksum annotations, in which case the message will include both.
-     * <p>
-     * Note: The checksum itself is entirely ignored by this method.
+     * Note: The correctness of the checksum itself is not verified by this method.
      */
     public VerifyChecksumAnnotationsResult verifyChecksumAnnotations() {
         var referencedConfigMaps = new HashSet<String>();
@@ -97,32 +83,28 @@ public class Workload {
             }
         }
 
-        // Get annotations from spec.template.metadata.annotations
-        var annotationsOpt = renderedKubernetesObject.yamlMap().getNested("spec.template.metadata.annotations");
-        Map<String, String> annotations = Map.of();
-        if (annotationsOpt.isPresent() && annotationsOpt.get() instanceof Map<?, ?> annotationsMap) {
-            annotations = castToStringStringMap(annotationsMap);
-        }
-
-        // Find checksum annotations
+        // Find checksum annotations from spec.template.metadata.annotations
         var checksumAnnotationsKeys = new HashSet<String>();
-        for (String annotationKey : annotations.keySet()) {
-            if (annotationKey.toLowerCase().contains("checksum")) {
-                checksumAnnotationsKeys.add(annotationKey);
+        var maybeAnnotations = renderedKubernetesObject.yamlMap().getNested("spec.template.metadata.annotations");
+        if (maybeAnnotations.isPresent() && maybeAnnotations.get() instanceof Map<?, ?> annotationsMap) {
+            //noinspection unchecked
+            var annotations = (Map<String, String>) annotationsMap;
+            for (String annotationKey : annotations.keySet()) {
+                if (annotationKey.toLowerCase().contains("checksum")) {
+                    checksumAnnotationsKeys.add(annotationKey);
+                }
             }
         }
 
         // Check for missing checksum annotations
         var messages = new ArrayList<String>();
-
         for (String configMapName : referencedConfigMaps) {
             if (checksumAnnotationsKeys.stream().noneMatch(it -> it.contains(configMapName))) {
                 messages.add("Missing checksum annotation for referenced ConfigMap '" + configMapName + "'.");
             }
         }
-
         for (String secretName : referencedSecrets) {
-            if (checksumAnnotationsKeys.stream().noneMatch(ann -> ann.contains(secretName))) {
+            if (checksumAnnotationsKeys.stream().noneMatch(it -> it.contains(secretName))) {
                 messages.add("Missing checksum annotation for referenced Secret '" + secretName + "'.");
             }
         }
@@ -134,10 +116,9 @@ public class Workload {
             }
         }
 
-        if (messages.isEmpty()) {
-            return VerifyChecksumAnnotationsResult.SUCCESS;
-        }
-        return new VerifyChecksumAnnotationsResult(false, String.join(" ", messages));
+        return messages.isEmpty()
+            ? VerifyChecksumAnnotationsResult.SUCCESS
+            : new VerifyChecksumAnnotationsResult(false, String.join(" ", messages));
     }
 
     private void collectReferencesFromContainer(YamlMap container, Set<String> configMaps, Set<String> secrets) {
@@ -163,11 +144,6 @@ public class Workload {
     @SuppressWarnings("unchecked")
     private Map<String, Object> castToStringObjectMap(Map<?, ?> map) {
         return (Map<String, Object>) map;
-    }
-
-    @SuppressWarnings("unchecked")
-    private Map<String, String> castToStringStringMap(Map<?, ?> map) {
-        return (Map<String, String>) map;
     }
 
     public record VerifyChecksumAnnotationsResult(boolean success, String message) {
