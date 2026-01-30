@@ -46,10 +46,10 @@ testing {
                 // Snapshot version
                 // Note: You need to use the 'refresh dependencies' feature of Gradle/IDEA
                 //       when updating the snapshot if you upload one during development.
-                implementation("com.rrmoore:helm-test-java:1.2-SNAPSHOT")
+                implementation("com.rrmoore:helm-test-java:${properties["helm-test-java.library.version"]}-SNAPSHOT")
 
                 // Stable version
-                // implementation("com.rrmoore:helm-test-java:1.1.1")
+                // implementation("com.rrmoore:helm-test-java:${properties["helm-test-java.library.version.stable"]}")
             }
         }
     }
