@@ -21,10 +21,6 @@ public class YamlMap {
         this.object = object;
     }
 
-    public static YamlMap fromKubernetesObject(KubernetesObject kubernetesObject) {
-        return new YamlMap(io.kubernetes.client.util.Yaml.dump(kubernetesObject));
-    }
-
     public Object get(String key) {
         return object.get(key);
     }
