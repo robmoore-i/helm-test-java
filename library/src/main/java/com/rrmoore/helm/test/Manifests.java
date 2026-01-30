@@ -17,6 +17,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -186,5 +187,24 @@ public class Manifests {
     public Workload getWorkload(String kind, String name) {
         return findWorkload(kind, name)
             .orElseThrow(() -> new IllegalArgumentException("No rendered Kubernetes workload object matches the provided predicate (workloads are defined here: https://kubernetes.io/docs/concepts/workloads)."));
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof Manifests manifests)) return false;
+        return new HashSet<>(renderedObjects).equals(new HashSet<>(manifests.renderedObjects));
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hashCode(new HashSet<>(renderedObjects));
+    }
+
+    @Override
+    public String toString() {
+        return "Manifests{" +
+            "renderedObjects=" + renderedObjects.stream().map(RenderedKubernetesObject::yamlMap).toList() +
+            '}';
     }
 }

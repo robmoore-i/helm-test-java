@@ -2,6 +2,7 @@ package com.rrmoore.helm.test.internal.jdkext;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
 import org.yaml.snakeyaml.Yaml;
@@ -72,5 +73,24 @@ public class YamlMap {
             return Optional.of(nextList.stream().map(it -> (Object) it).toList());
         }
         return Optional.empty();
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (o == null || getClass() != o.getClass()) return false;
+        YamlMap yamlMap = (YamlMap) o;
+        return Objects.equals(object, yamlMap.object);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hashCode(object);
+    }
+
+    @Override
+    public String toString() {
+        return "YamlMap{" +
+            "object=" + SNAKE_YAML.dump(object) +
+            '}';
     }
 }

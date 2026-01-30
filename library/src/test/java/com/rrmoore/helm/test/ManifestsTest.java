@@ -6,6 +6,7 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
 
 @SuppressWarnings("DataFlowIssue")
 public class ManifestsTest {
@@ -83,5 +84,26 @@ public class ManifestsTest {
             .filter(it -> it.getName().equals("main"))
             .findFirst().orElseThrow();
         assertEquals("IfNotPresent", mainContainer.getImagePullPolicy());
+    }
+
+    @Test
+    void canCompareEqualManifests() {
+        var helm = new HelmExecutor(new File("src/test/resources/my-app"));
+        var firstRendering = helm.template();
+        var secondRendering = helm.template();
+        assertEquals(firstRendering, secondRendering);
+    }
+
+    @Test
+    void canCompareUnequalManifests() {
+        var helm = new HelmExecutor(new File("src/test/resources/my-app"));
+        var values = """
+            equalityTesting:
+              useRandomSecret: true
+            """;
+
+        var firstRendering = helm.template(values);
+        var secondRendering = helm.template(values);
+        assertNotEquals(firstRendering, secondRendering);
     }
 }
