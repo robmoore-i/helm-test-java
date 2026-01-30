@@ -1,0 +1,110 @@
+package com.rrmoore.helm.test.jdkext;
+
+import io.kubernetes.client.common.KubernetesObject;
+import io.kubernetes.client.util.Yaml;
+import java.util.Optional;
+import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
+public class YamlMapTest {
+
+    private final String yaml = """
+        apiVersion: apps/v1
+        kind: Deployment
+        metadata:
+          name: gym-register-app
+          labels:
+            app.kubernetes.io/name: gym-register-app
+        spec:
+          replicas: 1
+          selector:
+            matchLabels:
+              app.kubernetes.io/name: gym-register-app
+          template:
+            metadata:
+              labels:
+                appName: gym-register-app
+              annotations:
+                configChecksum: aodgiub82bgew
+            spec:
+              serviceAccountName: gym-register-app-svc-acc
+              containers:
+                - name: main
+                  image: "gym-register-app"
+                  imagePullPolicy: "IfNotPresent"
+                  env:
+                  - name: GYM_REGISTER_APP__ALLOW_WALK_INS
+                    valueFrom:
+                      configMapKeyRef:
+                        name: gym-register-app-config
+                        key: allowWalkIns
+                  ports:
+                    - name: http
+                      containerPort: 80
+                      protocol: TCP
+                  livenessProbe:
+                    httpGet:
+                      path: /
+                      port: http
+                  readinessProbe:
+                    httpGet:
+                      path: /
+                      port: http
+        """;
+
+    private final YamlMap unit = new YamlMap(yaml);
+    private final KubernetesObject kubernetesObject = Exceptions.uncheck(() -> (KubernetesObject) Yaml.load(yaml));
+    private final YamlMap deserializedUnit = YamlMap.fromKubernetesObject(kubernetesObject);
+
+    @Test
+    void get() {
+        assertEquals("Deployment", unit.get("kind"));
+        assertEquals("Deployment", deserializedUnit.get("kind"));
+    }
+
+    @Test
+    void getString() {
+        assertEquals("Deployment", unit.getString("kind"));
+        assertEquals("Deployment", deserializedUnit.getString("kind"));
+    }
+
+    @Test
+    void getNestedTopLevel() {
+        assertEquals("Deployment", unit.getNested("kind").orElseThrow());
+        assertEquals("Deployment", deserializedUnit.getNested("kind").orElseThrow());
+    }
+
+    @Test
+    void getNestedNonExisting() {
+        assertEquals(Optional.empty(), unit.getNested("spec.foo"));
+        assertEquals(Optional.empty(), deserializedUnit.getNested("spec.foo"));
+    }
+
+    @Test
+    void getNestedEmpty() {
+        assertEquals(unit, unit.getNested("").orElseThrow());
+        assertEquals(deserializedUnit, deserializedUnit.getNested("").orElseThrow());
+    }
+
+    @Test
+    void getNestedString() {
+        assertEquals("gym-register-app-svc-acc", unit.getNestedString("spec.template.spec.serviceAccountName").orElseThrow());
+        assertEquals("gym-register-app-svc-acc", deserializedUnit.getNestedString("spec.template.spec.serviceAccountName").orElseThrow());
+    }
+
+    @Test
+    void getNestedList() {
+        assertEquals(1, unit.getNestedList("spec.template.spec.containers").orElseThrow().size());
+        assertEquals(1, deserializedUnit.getNestedList("spec.template.spec.containers").orElseThrow().size());
+    }
+
+    @Test
+    void getNestedObject() {
+        var templateMetadata = unit.getNestedObject("spec.template.metadata").orElseThrow();
+        assertEquals("gym-register-app", templateMetadata.getNestedString("labels.appName").orElseThrow());
+
+        var templateMetadataDeserialized = deserializedUnit.getNestedObject("spec.template.metadata").orElseThrow();
+        assertEquals("gym-register-app", templateMetadataDeserialized.getNestedString("labels.appName").orElseThrow());
+    }
+}

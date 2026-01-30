@@ -1,6 +1,7 @@
 package com.rrmoore.helm.test;
 
 import com.rrmoore.helm.test.jdkext.Exceptions;
+import com.rrmoore.helm.test.jdkext.YamlMap;
 import io.kubernetes.client.common.KubernetesObject;
 import io.kubernetes.client.openapi.models.V1ConfigMap;
 import io.kubernetes.client.openapi.models.V1Deployment;
@@ -22,6 +23,8 @@ import java.util.Optional;
 import java.util.function.Predicate;
 import kotlin.text.Charsets;
 
+import static com.rrmoore.helm.test.Workload.WORKLOAD_KINDS;
+
 /**
  * Represents the rendered Kubernetes manifests created by `helm template`.
  * <p>
@@ -30,9 +33,9 @@ import kotlin.text.Charsets;
  */
 public class Manifests {
 
-    private final List<KubernetesObject> renderedObjects;
+    private final List<RenderedKubernetesObject> renderedObjects;
 
-    public Manifests(List<KubernetesObject> renderedObjects) {
+    public Manifests(List<RenderedKubernetesObject> renderedObjects) {
         this.renderedObjects = renderedObjects;
     }
 
@@ -43,7 +46,10 @@ public class Manifests {
     public static Manifests fromYaml(String yaml) {
         var renderedObjects = Arrays.stream(yaml.split("---"))
             .skip(1)
-            .map(kubernetesResourceYaml -> Exceptions.uncheck(() -> (KubernetesObject) Yaml.load(kubernetesResourceYaml)))
+            .map(kubernetesResourceYaml -> new RenderedKubernetesObject(
+                Exceptions.uncheck(() -> (KubernetesObject) Yaml.load(kubernetesResourceYaml)),
+                new YamlMap(kubernetesResourceYaml)
+            ))
             .toList();
         return new Manifests(renderedObjects);
     }
@@ -61,6 +67,7 @@ public class Manifests {
      */
     public List<KubernetesObject> findAll(Predicate<KubernetesObject> predicate) {
         return renderedObjects.stream()
+            .map(RenderedKubernetesObject::kubernetesObject)
             .filter(predicate)
             .toList();
     }
@@ -159,5 +166,12 @@ public class Manifests {
 
     public V1PersistentVolumeClaim getPersistentVolumeClaim(String name) {
         return getOne("v1", "PersistentVolumeClaim", name, V1PersistentVolumeClaim.class);
+    }
+
+    public List<Workload> findAllWorkloads() {
+        return renderedObjects.stream()
+            .filter(it -> WORKLOAD_KINDS.contains(it.kubernetesObject().getKind()))
+            .map(Workload::new)
+            .toList();
     }
 }

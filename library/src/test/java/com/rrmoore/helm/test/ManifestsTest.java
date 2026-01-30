@@ -64,4 +64,15 @@ public class ManifestsTest {
     void canGetPvc() {
         assertEquals("ReadWriteOnce", manifests.getPersistentVolumeClaim("app-data").getSpec().getAccessModes().getFirst());
     }
+
+    @Test
+    void canGetWorkloads() {
+        var appWorkload = manifests.findAllWorkloads().stream()
+            .filter(it -> it.name().equals("my-app"))
+            .findFirst().orElseThrow();
+        var mainContainer = appWorkload.containers().stream()
+            .filter(it -> it.getName().equals("main"))
+            .findFirst().orElseThrow();
+        assertEquals("nginx:1.16.0", mainContainer.getImage());
+    }
 }
