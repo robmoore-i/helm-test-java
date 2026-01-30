@@ -31,7 +31,7 @@ public class WorkloadTest {
         var workload = manifests.getWorkload("Deployment", "checksum-annotation-tester");
         var result = workload.verifyChecksumAnnotations();
         assertFalse(result.success());
-        assertEquals("Missing checksum annotation for referenced ConfigMap 'checksum-annotation-tester-config'.", result.message());
+        assertEquals("Workload 'checksum-annotation-tester' is missing checksum annotation for referenced ConfigMap 'checksum-annotation-tester-config'.", result.message());
     }
 
     @Test
@@ -45,7 +45,7 @@ public class WorkloadTest {
         var workload = manifests.getWorkload("Deployment", "checksum-annotation-tester");
         var result = workload.verifyChecksumAnnotations();
         assertFalse(result.success());
-        assertEquals("Missing checksum annotation for referenced Secret 'checksum-annotation-tester-secret'.", result.message());
+        assertEquals("Workload 'checksum-annotation-tester' is missing checksum annotation for referenced Secret 'checksum-annotation-tester-secret'.", result.message());
     }
 
     @Test
@@ -59,7 +59,7 @@ public class WorkloadTest {
         var workload = manifests.getWorkload("Deployment", "checksum-annotation-tester");
         var result = workload.verifyChecksumAnnotations();
         assertFalse(result.success());
-        assertEquals("Missing checksum annotation for referenced Secret 'my-registry-credentials'.", result.message());
+        assertEquals("Workload 'checksum-annotation-tester' is missing checksum annotation for referenced Secret 'my-registry-credentials'.", result.message());
     }
 
     @Test
@@ -73,7 +73,7 @@ public class WorkloadTest {
         var workload = manifests.getWorkload("Deployment", "checksum-annotation-tester");
         var result = workload.verifyChecksumAnnotations();
         assertFalse(result.success());
-        assertEquals("Missing checksum annotation for referenced ConfigMap 'volume-config'.", result.message());
+        assertEquals("Workload 'checksum-annotation-tester' is missing checksum annotation for referenced ConfigMap 'volume-config'.", result.message());
     }
 
     @Test
@@ -87,7 +87,7 @@ public class WorkloadTest {
         var workload = manifests.getWorkload("Deployment", "checksum-annotation-tester");
         var result = workload.verifyChecksumAnnotations();
         assertFalse(result.success());
-        assertEquals("Missing checksum annotation for referenced Secret 'volume-secret'.", result.message());
+        assertEquals("Workload 'checksum-annotation-tester' is missing checksum annotation for referenced Secret 'volume-secret'.", result.message());
     }
 
     @Test
@@ -101,7 +101,7 @@ public class WorkloadTest {
         var workload = manifests.getWorkload("Deployment", "checksum-annotation-tester");
         var result = workload.verifyChecksumAnnotations();
         assertFalse(result.success());
-        assertEquals("Missing checksum annotation for referenced ConfigMap 'envfrom-config'.", result.message());
+        assertEquals("Workload 'checksum-annotation-tester' is missing checksum annotation for referenced ConfigMap 'envfrom-config'.", result.message());
     }
 
     @Test
@@ -115,7 +115,7 @@ public class WorkloadTest {
         var workload = manifests.getWorkload("Deployment", "checksum-annotation-tester");
         var result = workload.verifyChecksumAnnotations();
         assertFalse(result.success());
-        assertEquals("Missing checksum annotation for referenced Secret 'envfrom-secret'.", result.message());
+        assertEquals("Workload 'checksum-annotation-tester' is missing checksum annotation for referenced Secret 'envfrom-secret'.", result.message());
     }
 
     @Test
@@ -129,8 +129,8 @@ public class WorkloadTest {
         var workload = manifests.getWorkload("Deployment", "checksum-annotation-tester");
         var result = workload.verifyChecksumAnnotations();
         assertFalse(result.success());
-        assertTrue(result.message().contains("Missing checksum annotation for referenced ConfigMap 'checksum-annotation-tester-config'."));
-        assertTrue(result.message().contains("Missing checksum annotation for referenced Secret 'checksum-annotation-tester-secret'."));
+        assertTrue(result.message().contains("Workload 'checksum-annotation-tester' is missing checksum annotation for referenced ConfigMap 'checksum-annotation-tester-config'."));
+        assertTrue(result.message().contains("Workload 'checksum-annotation-tester' is missing checksum annotation for referenced Secret 'checksum-annotation-tester-secret'."));
     }
 
     @Test
@@ -144,7 +144,7 @@ public class WorkloadTest {
         var workload = manifests.getWorkload("Deployment", "checksum-annotation-tester");
         var result = workload.verifyChecksumAnnotations();
         assertFalse(result.success());
-        assertEquals("Unnecessary extra checksum annotation 'checksum/checksum-annotation-tester-extra-config'.", result.message());
+        assertEquals("Workload 'checksum-annotation-tester' has unnecessary extra checksum annotation 'checksum/checksum-annotation-tester-extra-config'.", result.message());
     }
 
     @Test
@@ -159,7 +159,7 @@ public class WorkloadTest {
         var workload = manifests.getWorkload("Deployment", "checksum-annotation-tester");
         var result = workload.verifyChecksumAnnotations();
         assertFalse(result.success());
-        assertTrue(result.message().contains("Missing checksum annotation for referenced ConfigMap 'checksum-annotation-tester-config'."));
-        assertTrue(result.message().contains("Unnecessary extra checksum annotation 'checksum/checksum-annotation-tester-extra-config'."));
+        assertTrue(result.message().contains("Workload 'checksum-annotation-tester' is missing checksum annotation for referenced ConfigMap 'checksum-annotation-tester-config'."));
+        assertTrue(result.message().contains("Workload 'checksum-annotation-tester' has unnecessary extra checksum annotation 'checksum/checksum-annotation-tester-extra-config'."));
     }
 }

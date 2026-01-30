@@ -4,6 +4,7 @@ import com.rrmoore.helm.test.jdkext.YamlMap;
 import io.kubernetes.client.openapi.models.V1Container;
 import io.kubernetes.client.util.Yaml;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -18,13 +19,15 @@ public class Workload {
     private final RenderedKubernetesObject renderedKubernetesObject;
 
     public Workload(RenderedKubernetesObject renderedKubernetesObject) {
-        checkKind(renderedKubernetesObject.kubernetesObject().getKind());
+        checkKind(renderedKubernetesObject.kubernetesObject().getKind(),
+            renderedKubernetesObject.kubernetesObject().getMetadata().getName());
         this.renderedKubernetesObject = renderedKubernetesObject;
     }
 
-    public static void checkKind(String kind) {
+    public static void checkKind(String kind, String... context) {
         if (!WORKLOAD_KINDS.contains(kind)) {
-            throw new IllegalArgumentException("Kind '" + kind + "' is not recognised as a workload kind.");
+            var contextSuffix = context.length == 0 ? "" : " (" + Arrays.toString(context) + ")";
+            throw new IllegalArgumentException("Kind '" + kind + "' is not recognised as a workload kind." + contextSuffix);
         }
     }
 
@@ -100,25 +103,25 @@ public class Workload {
         var messages = new ArrayList<String>();
         for (String configMapName : referencedConfigMaps) {
             if (checksumAnnotationsKeys.stream().noneMatch(it -> it.contains(configMapName))) {
-                messages.add("Missing checksum annotation for referenced ConfigMap '" + configMapName + "'.");
+                messages.add("Workload '" + name() + "' is missing checksum annotation for referenced ConfigMap '" + configMapName + "'.");
             }
         }
         for (String secretName : referencedSecrets) {
             if (checksumAnnotationsKeys.stream().noneMatch(it -> it.contains(secretName))) {
-                messages.add("Missing checksum annotation for referenced Secret '" + secretName + "'.");
+                messages.add("Workload '" + name() + "' is missing checksum annotation for referenced Secret '" + secretName + "'.");
             }
         }
 
         // Check for unnecessary checksum annotations
         for (String annotationKey : checksumAnnotationsKeys) {
             if (Stream.concat(referencedConfigMaps.stream(), referencedSecrets.stream()).noneMatch(annotationKey::contains)) {
-                messages.add("Unnecessary extra checksum annotation '" + annotationKey + "'.");
+                messages.add("Workload '" + name() + "' has unnecessary extra checksum annotation '" + annotationKey + "'.");
             }
         }
 
         return messages.isEmpty()
             ? VerifyChecksumAnnotationsResult.SUCCESS
-            : new VerifyChecksumAnnotationsResult(false, String.join(" ", messages));
+            : new VerifyChecksumAnnotationsResult(false, String.join("\n", messages));
     }
 
     private void collectReferencesFromContainer(YamlMap container, Set<String> configMaps, Set<String> secrets) {

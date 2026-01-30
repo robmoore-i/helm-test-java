@@ -176,7 +176,7 @@ public class Manifests {
     }
 
     public Optional<Workload> findWorkload(String kind, String name) {
-        Workload.checkKind(kind);
+        Workload.checkKind(kind, name);
         return renderedObjects.stream()
             .filter(it -> name.equals(it.kubernetesObject().getMetadata().getName()) && it.kubernetesObject().getKind().equals(kind))
             .map(Workload::new)
