@@ -1,0 +1,108 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "type": "object",
+  "properties": {
+    "checksumAnnotationTest": {
+      "type": ["object", "null"],
+      "additionalProperties": false,
+      "properties": {
+        "missingConfigMapVolumeAnnotation": {
+          "type": ["boolean", "null"]
+        },
+        "missingEnvConfigMapAnnotation": {
+          "type": ["boolean", "null"]
+        },
+        "missingEnvFromConfigMapAnnotation": {
+          "type": ["boolean", "null"]
+        },
+        "missingEnvFromSecretAnnotation": {
+          "type": ["boolean", "null"]
+        },
+        "missingEnvSecretAnnotation": {
+          "type": ["boolean", "null"]
+        },
+        "missingImagePullSecretAnnotation": {
+          "type": ["boolean", "null"]
+        },
+        "missingSecretVolumeAnnotation": {
+          "type": ["boolean", "null"]
+        },
+        "noAnnotations": {
+          "type": ["boolean", "null"]
+        },
+        "unnecessaryExtraResourceAnnotation": {
+          "type": ["boolean", "null"]
+        }
+      }
+    },
+    "config2": {
+      "type": ["object", "null"],
+      "additionalProperties": false,
+      "properties": {
+        "enabled": {
+          "type": ["boolean", "null"]
+        }
+      }
+    },
+    "deeply": {
+      "type": ["object", "null"],
+      "additionalProperties": false,
+      "properties": {
+        "nested": {
+          "type": ["object", "null"],
+          "additionalProperties": false,
+          "properties": {
+            "value": {
+              "type": ["object", "null"],
+              "additionalProperties": false,
+              "properties": {
+                "here": {
+                  "type": ["string", "null"]
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "edge": {
+      "type": ["object", "null"],
+      "additionalProperties": false,
+      "properties": {
+        "first": {
+          "type": ["string", "null"]
+        },
+        "second": {
+          "type": ["string", "null"]
+        },
+        "useFeature": {
+          "type": ["boolean", "null"]
+        }
+      }
+    },
+    "equalityTesting": {
+      "type": ["object", "null"],
+      "additionalProperties": false,
+      "properties": {
+        "useRandomSecret": {
+          "type": ["boolean", "null"]
+        }
+      }
+    },
+    "image": {
+      "type": ["object", "null"],
+      "additionalProperties": false,
+      "properties": {
+        "pullPolicy": {
+          "type": ["string", "null"]
+        }
+      }
+    },
+    "replicas": {
+      "type": ["integer", "null"]
+    },
+    "with_underscore": {
+      "type": ["string", "null"]
+    }
+  }
+}

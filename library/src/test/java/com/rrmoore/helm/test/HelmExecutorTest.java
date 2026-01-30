@@ -120,4 +120,19 @@ public class HelmExecutorTest {
         var deployment = (V1Deployment) manifests.getOne("apps/v1", "Deployment", "my-app");
         assertEquals("IfNotPresent", deployment.getSpec().getTemplate().getSpec().getContainers().getFirst().getImagePullPolicy());
     }
+
+    @Test
+    void canRenderSchemaValidationError() {
+        var values = """
+            image:
+              unknownValue: bang
+            """;
+
+        try {
+            helm.template(values);
+            assert false : "Expected an Exception to be thrown, but none was";
+        } catch (Exception e) {
+            assertThat(e.getMessage(), containsString("at '/image': additional properties 'unknownValue' not allowed"));
+        }
+    }
 }
