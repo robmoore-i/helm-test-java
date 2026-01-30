@@ -13,11 +13,14 @@ public class Workload {
     private final RenderedKubernetesObject renderedKubernetesObject;
 
     public Workload(RenderedKubernetesObject renderedKubernetesObject) {
-        var kind = renderedKubernetesObject.kubernetesObject().getKind();
+        checkKind(renderedKubernetesObject.kubernetesObject().getKind());
+        this.renderedKubernetesObject = renderedKubernetesObject;
+    }
+
+    public static void checkKind(String kind) {
         if (!WORKLOAD_KINDS.contains(kind)) {
             throw new IllegalArgumentException("Kind '" + kind + "' is not recognised as a workload kind.");
         }
-        this.renderedKubernetesObject = renderedKubernetesObject;
     }
 
     public String name() {

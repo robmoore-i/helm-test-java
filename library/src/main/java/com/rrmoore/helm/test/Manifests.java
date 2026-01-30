@@ -174,4 +174,17 @@ public class Manifests {
             .map(Workload::new)
             .toList();
     }
+
+    public Optional<Workload> findWorkload(String kind, String name) {
+        Workload.checkKind(kind);
+        return renderedObjects.stream()
+            .filter(it -> name.equals(it.kubernetesObject().getMetadata().getName()) && it.kubernetesObject().getKind().equals(kind))
+            .map(Workload::new)
+            .findFirst();
+    }
+
+    public Workload getWorkload(String kind, String name) {
+        return findWorkload(kind, name)
+            .orElseThrow(() -> new IllegalArgumentException("No rendered Kubernetes workload object matches the provided predicate (workloads are defined here: https://kubernetes.io/docs/concepts/workloads)."));
+    }
 }

@@ -66,7 +66,7 @@ public class ManifestsTest {
     }
 
     @Test
-    void canGetWorkloads() {
+    void canFindAllWorkloads() {
         var appWorkload = manifests.findAllWorkloads().stream()
             .filter(it -> it.name().equals("my-app"))
             .findFirst().orElseThrow();
@@ -74,5 +74,14 @@ public class ManifestsTest {
             .filter(it -> it.getName().equals("main"))
             .findFirst().orElseThrow();
         assertEquals("nginx:1.16.0", mainContainer.getImage());
+    }
+
+    @Test
+    void canFindWorkload() {
+        var appWorkload = manifests.findWorkload("Deployment", "my-app").orElseThrow();
+        var mainContainer = appWorkload.containers().stream()
+            .filter(it -> it.getName().equals("main"))
+            .findFirst().orElseThrow();
+        assertEquals("IfNotPresent", mainContainer.getImagePullPolicy());
     }
 }
