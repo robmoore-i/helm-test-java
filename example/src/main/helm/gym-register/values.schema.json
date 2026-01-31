@@ -1,0 +1,54 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "type": "object",
+  "properties": {
+    "image": {
+      "type": ["object", "null"],
+      "additionalProperties": false,
+      "properties": {
+        "imagePullPolicy": {
+          "type": ["string", "null"]
+        }
+      }
+    },
+    "gymRegisterApp": {
+      "type": ["object", "null"],
+      "additionalProperties": false,
+      "properties": {
+        "replicas": {
+          "type": ["integer", "null"]
+        },
+        "walkInPolicy": {
+          "type": ["string", "null"]
+        },
+        "automountServiceAccountToken": {
+          "type": ["boolean", "null"]
+        }
+      }
+    },
+    "database": {
+      "type": ["object", "null"],
+      "additionalProperties": false,
+      "properties": {
+        "automountServiceAccountToken": {
+          "type": ["boolean", "null"]
+        },
+        "credentials": {
+          "type": ["object", "null"],
+          "additionalProperties": false,
+          "properties": {
+            "superuser": {
+              "type": ["object", "null"],
+              "additionalProperties": false,
+              "properties": {
+                "password": {
+                  "type": ["string", "null"]
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

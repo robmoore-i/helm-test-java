@@ -54,13 +54,8 @@ testing {
                 targets {
                     all {
                         testTask {
-                            sources.java.srcDir(layout.projectDirectory.dir("src/test/java"))
+                            sources.java.srcDir(test.map { it.sources.java.sourceDirectories })
                         }
-                    }
-                }
-                dependencies {
-                    implementation("com.networknt:json-schema-validator:3.0.0") {
-                        because("Used for schema-template parity test")
                     }
                 }
             }

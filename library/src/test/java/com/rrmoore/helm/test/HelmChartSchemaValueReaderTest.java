@@ -1,0 +1,37 @@
+package com.rrmoore.helm.test;
+
+import java.io.File;
+import java.util.Set;
+import java.util.TreeSet;
+import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
+public class HelmChartSchemaValueReaderTest {
+
+    @Test
+    void readsValues() {
+        var reader = new HelmChartSchemaValueReader();
+        var values = reader.readValues(new File("src/test/resources/my-app"));
+        assertEquals(new TreeSet<>(Set.of(
+            "checksumAnnotationTest.missingConfigMapVolumeAnnotation",
+            "checksumAnnotationTest.missingEnvConfigMapAnnotation",
+            "checksumAnnotationTest.missingEnvFromConfigMapAnnotation",
+            "checksumAnnotationTest.missingEnvFromSecretAnnotation",
+            "checksumAnnotationTest.missingEnvSecretAnnotation",
+            "checksumAnnotationTest.missingImagePullSecretAnnotation",
+            "checksumAnnotationTest.missingSecretVolumeAnnotation",
+            "checksumAnnotationTest.noAnnotations",
+            "checksumAnnotationTest.unnecessaryExtraResourceAnnotation",
+            "config2.enabled",
+            "deeply.nested.value.here",
+            "edge.first",
+            "edge.second",
+            "edge.useFeature",
+            "equalityTesting.useRandomSecret",
+            "image.pullPolicy",
+            "replicas",
+            "with_underscore"
+        )), values);
+    }
+}

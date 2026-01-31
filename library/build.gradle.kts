@@ -23,11 +23,13 @@ dependencies {
     // Unfortunately there is no package that just exports the ability to parse the models,
     // so we drag in the whole Java client. Not the end of the world.
     api("io.kubernetes:client-java:25.0.0")
+
+    implementation("com.networknt:json-schema-validator:3.0.0")
 }
 
 testing {
     suites {
-        val test by getting(JvmTestSuite::class) {
+        named<JvmTestSuite>("test") {
             useJUnitJupiter()
             dependencies {
                 implementation("org.hamcrest:hamcrest:3.0")
