@@ -38,18 +38,47 @@ configurations.all {
 
 testing {
     suites {
-        named<JvmTestSuite>("test") {
+        // Runs tests using the stable version of the library
+        val test by existing(JvmTestSuite::class) {
+            dependencies {
+                implementation("com.rrmoore:helm-test-java:${properties["helm-test-java.library.version.stable"]}")
+            }
+        }
+
+        withType<JvmTestSuite> {
             useJUnitJupiter()
             dependencies {
                 implementation("org.hamcrest:hamcrest:3.0")
+            }
+            if (name != "test") {
+                targets {
+                    all {
+                        testTask {
+                            sources.java.srcDir(layout.projectDirectory.dir("src/test/java"))
+                        }
+                    }
+                }
+                dependencies {
+                    implementation("com.networknt:json-schema-validator:3.0.0") {
+                        because("Used for schema-template parity test")
+                    }
+                }
+            }
+        }
 
-                // Snapshot version
+        // Runs tests using the local version of the library
+        register<JvmTestSuite>("localVersionTest") {
+            dependencies {
+                implementation(project(":library"))
+            }
+        }
+
+        // Runs tests using the snapshot version of the library
+        register<JvmTestSuite>("snapshotVersionTest") {
+            dependencies {
                 // Note: You need to use the 'refresh dependencies' feature of Gradle/IDEA
                 //       when updating the snapshot if you upload one during development.
                 implementation("com.rrmoore:helm-test-java:${properties["helm-test-java.library.version"]}-SNAPSHOT")
-
-                // Stable version
-                // implementation("com.rrmoore:helm-test-java:${properties["helm-test-java.library.version.stable"]}")
             }
         }
     }
