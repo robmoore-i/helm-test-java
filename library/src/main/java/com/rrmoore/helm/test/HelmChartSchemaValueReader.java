@@ -24,6 +24,9 @@ public class HelmChartSchemaValueReader {
     }
 
     public TreeSet<String> readValuesFromSchemaFile(File schemaFile) {
+        if (!schemaFile.isFile()) {
+            throw new RuntimeException("Cannot read values from non-existent schema file '" + schemaFile.getAbsolutePath() + "'. Create it and try again.");
+        }
         var schema = SchemaRegistry.withDefaultDialect(SpecificationVersion.DRAFT_7)
             .getSchema(Exceptions.uncheck(() -> new FileInputStream(schemaFile)));
         var walkHandler = PropertyWalkHandler.builder()
