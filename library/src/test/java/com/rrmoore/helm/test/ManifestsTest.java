@@ -15,7 +15,7 @@ public class ManifestsTest {
 
     @BeforeAll
     static void beforeAll() {
-        var helm = new HelmExecutor(new File("src/test/resources/my-app"));
+        var helm = new HelmExecutor(new HelmChart(new File("src/test/resources/my-app")));
         manifests = helm.template();
     }
 
@@ -88,7 +88,7 @@ public class ManifestsTest {
 
     @Test
     void canCompareEqualManifests() {
-        var helm = new HelmExecutor(new File("src/test/resources/my-app"));
+        var helm = new HelmExecutor(new HelmChart(new File("src/test/resources/my-app")));
         var firstRendering = helm.template();
         var secondRendering = helm.template();
         assertEquals(firstRendering, secondRendering);
@@ -96,7 +96,7 @@ public class ManifestsTest {
 
     @Test
     void canCompareUnequalManifests() {
-        var helm = new HelmExecutor(new File("src/test/resources/my-app"));
+        var helm = new HelmExecutor(new HelmChart(new File("src/test/resources/my-app")));
         var values = """
             equalityTesting:
               useRandomSecret: true

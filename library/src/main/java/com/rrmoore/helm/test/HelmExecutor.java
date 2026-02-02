@@ -22,10 +22,25 @@ import java.util.stream.Stream;
 public class HelmExecutor {
 
     private final File helmExecutable;
-    private final File chart;
+    private final HelmChart chart;
 
     private final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("uuuuMMddHHmmss");
     private final ZonedDateTime initTimestamp = Instant.now().atZone(ZoneOffset.UTC);
+
+    /**
+     * Creates a Helm executor, determining the path to the Helm executable file using a JVM system property,
+     * which is set automatically by applying the helm-test-java Gradle plugin.
+     */
+    public HelmExecutor(HelmChart chart) {
+        this(
+            new File(Objects.requireNonNull(
+                System.getProperty("com.rrmoore.helm.test.executable.path"),
+                "Missing system property for determining the path to the Helm executable downloaded by the helm-test-java Gradle plugin. " +
+                    "Is the plugin applied to this Gradle build?"
+            )),
+            chart
+        );
+    }
 
     /**
      * Creates a Helm executor, determining the path to the Helm executable file using a JVM system property,
@@ -45,17 +60,21 @@ public class HelmExecutor {
     /**
      * Creates a Helm executor, using the provided Helm executable File i.e. the runnable `helm` binary file.
      */
-    public HelmExecutor(File helmExecutable, File chart) {
+    public HelmExecutor(File helmExecutable, HelmChart chart) {
         if (!helmExecutable.isFile()) {
             throw new IllegalArgumentException("Helm executable file '" + helmExecutable.getAbsolutePath() + "' does not exist.");
         } else if (!helmExecutable.canExecute() && !helmExecutable.setExecutable(true)) {
             throw new IllegalArgumentException("Helm executable file '" + helmExecutable.getAbsolutePath() + "' is not executable, and failed in an attempt to set it to be executable.");
         }
-        if (!chart.exists()) {
-            throw new IllegalArgumentException("Helm chart '" + chart.getAbsolutePath() + "' does not exist.");
-        }
         this.helmExecutable = helmExecutable;
         this.chart = chart;
+    }
+
+    /**
+     * Creates a Helm executor, using the provided Helm executable File i.e. the runnable `helm` binary file.
+     */
+    public HelmExecutor(File helmExecutable, File chart) {
+        this(helmExecutable, new HelmChart(chart));
     }
 
     /**
@@ -107,7 +126,7 @@ public class HelmExecutor {
      * @return The error output of the `helm` process.
      */
     public String templateError(List<String> valuesYamls) {
-        var helmArgs = new ArrayList<>(List.of("template", chart.getAbsolutePath()));
+        var helmArgs = new ArrayList<>(List.of("template", chart.getFile().getAbsolutePath()));
         helmArgs.addAll(templateValuesArgs(valuesYamls));
         return executeHelmForError(helmArgs);
     }
@@ -124,7 +143,7 @@ public class HelmExecutor {
     }
 
     private Manifests executeHelmTemplate(List<String> args) {
-        var helmArgs = new ArrayList<>(List.of("template", chart.getAbsolutePath()));
+        var helmArgs = new ArrayList<>(List.of("template", chart.getFile().getAbsolutePath()));
         helmArgs.addAll(args);
         var output = executeHelmForOutput(helmArgs);
         return Manifests.fromYaml(output);

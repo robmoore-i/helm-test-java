@@ -13,7 +13,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 @SuppressWarnings("DataFlowIssue")
 public class HelmExecutorTest {
 
-    private final HelmExecutor helm = new HelmExecutor(new File("src/test/resources/my-app"));
+    private final HelmExecutor helm = new HelmExecutor(new HelmChart(new File("src/test/resources/my-app")));
 
     @Test
     void canGetVersion() {

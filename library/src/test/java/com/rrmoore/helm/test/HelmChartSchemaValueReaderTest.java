@@ -52,7 +52,7 @@ public class HelmChartSchemaValueReaderTest {
 
     @Test
     void readsValuesFromMyAppChart() {
-        var values = reader.readValues(new File("src/test/resources/my-app"));
+        var values = reader.readValues(new HelmChart(new File("src/test/resources/my-app")));
         assertEquals(new TreeSet<>(Set.of(
             "checksumAnnotationTest.missingConfigMapVolumeAnnotation",
             "checksumAnnotationTest.missingEnvConfigMapAnnotation",

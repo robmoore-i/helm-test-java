@@ -19,8 +19,8 @@ import java.util.stream.Collectors;
 
 public class HelmChartSchemaValueReader {
 
-    public TreeSet<String> readValues(File chart) {
-        return readValuesFromSchemaFile(new File(chart, "values.schema.json"));
+    public TreeSet<String> readValues(HelmChart chart) {
+        return readValuesFromSchemaFile(chart.getSchemaFile());
     }
 
     public TreeSet<String> readValuesFromSchemaFile(File schemaFile) {

@@ -12,7 +12,7 @@ class HelmChartValueScraperTest {
     @Test
     void scrapesValuesFromTemplates() {
         var scraper = new HelmChartValueScraper();
-        var values = scraper.readValues(new File("src/test/resources/my-app"));
+        var values = scraper.readValues(new HelmChart(new File("src/test/resources/my-app")));
         assertEquals(new TreeSet<>(Set.of(
             "checksumAnnotationTest.missingConfigMapVolumeAnnotation",
             "checksumAnnotationTest.missingEnvConfigMapAnnotation",

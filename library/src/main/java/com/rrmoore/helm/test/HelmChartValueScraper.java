@@ -1,6 +1,5 @@
 package com.rrmoore.helm.test;
 
-import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -23,9 +22,9 @@ public class HelmChartValueScraper {
      * <p>
      * In essence, this method goes through the lines of Go template looking for the pattern .Values.*.
      */
-    public TreeSet<String> readValues(File chart) {
+    public TreeSet<String> readValues(HelmChart chart) {
         var values = new TreeSet<String>();
-        var templatesDir = new File(chart, "templates");
+        var templatesDir = chart.getTemplatesDir();
 
         if (!templatesDir.isDirectory()) {
             return values;
