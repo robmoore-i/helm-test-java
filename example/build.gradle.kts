@@ -36,6 +36,14 @@ configurations.all {
     }
 }
 
+abstract class TestLifecycleService : BuildService<TestLifecycleService.Parameters>, AutoCloseable {
+    interface Parameters : BuildServiceParameters
+}
+
+val testLifecycleService = gradle.sharedServices.registerIfAbsent("testLifecycleService", TestLifecycleService::class.java) {
+    maxParallelUsages.set(1)
+}
+
 testing {
     suites {
         // Runs tests using the stable version of the library
@@ -50,10 +58,11 @@ testing {
             dependencies {
                 implementation("org.hamcrest:hamcrest:3.0")
             }
-            if (name != "test") {
-                targets {
-                    all {
-                        testTask {
+            targets {
+                all {
+                    testTask {
+                        usesService(testLifecycleService)
+                        if (name != "test") {
                             sources.java.srcDir(test.map { it.sources.java.sourceDirectories })
                         }
                     }
@@ -71,8 +80,8 @@ testing {
         // Runs tests using the snapshot version of the library
         register<JvmTestSuite>("snapshotVersionTest") {
             dependencies {
-                // Note: You need to use the 'refresh dependencies' feature of Gradle/IDEA
-                //       when updating the snapshot if you upload one during development.
+                // Intellij should automatically refresh this dependency when syncing or running the test task.
+                // If it doesn't, you can manually refresh it by triggering a sync.
                 implementation("com.rrmoore:helm-test-java:${properties["helm-test-java.library.version"]}-SNAPSHOT")
             }
         }
