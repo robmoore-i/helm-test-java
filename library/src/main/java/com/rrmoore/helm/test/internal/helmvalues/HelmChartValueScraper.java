@@ -1,5 +1,6 @@
-package com.rrmoore.helm.test;
+package com.rrmoore.helm.test.internal.helmvalues;
 
+import com.rrmoore.helm.test.HelmChart;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -9,7 +10,6 @@ import java.util.regex.Pattern;
 
 public class HelmChartValueScraper {
 
-    // Pattern for .Values.foo.bar references (applied after stripping parentheses)
     private static final Pattern VALUES_PATTERN = Pattern.compile("\\.Values\\.([a-zA-Z_][a-zA-Z0-9_]*(\\.[a-zA-Z_][a-zA-Z0-9_]*)*)");
 
     /**

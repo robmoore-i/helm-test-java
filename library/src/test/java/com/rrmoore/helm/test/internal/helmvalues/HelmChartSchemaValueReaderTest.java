@@ -1,5 +1,6 @@
-package com.rrmoore.helm.test;
+package com.rrmoore.helm.test.internal.helmvalues;
 
+import com.rrmoore.helm.test.HelmChart;
 import java.io.File;
 import java.util.Collections;
 import java.util.Set;

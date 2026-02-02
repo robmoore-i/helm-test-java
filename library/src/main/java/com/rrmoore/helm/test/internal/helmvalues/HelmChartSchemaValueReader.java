@@ -1,4 +1,4 @@
-package com.rrmoore.helm.test;
+package com.rrmoore.helm.test.internal.helmvalues;
 
 import com.networknt.schema.CollectorContext;
 import com.networknt.schema.Error;
@@ -9,6 +9,7 @@ import com.networknt.schema.walk.PropertyWalkHandler;
 import com.networknt.schema.walk.WalkEvent;
 import com.networknt.schema.walk.WalkFlow;
 import com.networknt.schema.walk.WalkListener;
+import com.rrmoore.helm.test.HelmChart;
 import com.rrmoore.helm.test.internal.jdkext.Exceptions;
 import java.io.File;
 import java.io.FileInputStream;
