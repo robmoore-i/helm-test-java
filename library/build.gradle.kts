@@ -42,11 +42,15 @@ helmToolchain {
     helmVersion = "3.19.4"
 }
 
+val isPromote = properties.containsKey("promote")
+val developmentVersion = properties["helm-test-java.library.version.development"] as String
+val publicationVersion = if (isPromote) developmentVersion else { "$developmentVersion-SNAPSHOT" }
+
 mavenPublishing {
     publishToMavenCentral()
     signAllPublications()
 
-    coordinates("com.rrmoore", "helm-test-java", "${properties["helm-test-java.library.version"]}-SNAPSHOT")
+    coordinates("com.rrmoore", "helm-test-java", publicationVersion)
     pom {
         name = "Helm Test Java"
         description = "A library for writing automated tests for Helm charts"

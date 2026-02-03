@@ -82,7 +82,7 @@ testing {
             dependencies {
                 // Intellij should automatically refresh this dependency when syncing or running the test task.
                 // If it doesn't, you can manually refresh it by triggering a sync.
-                implementation("com.rrmoore:helm-test-java:${properties["helm-test-java.library.version"]}-SNAPSHOT")
+                implementation("com.rrmoore:helm-test-java:${properties["helm-test-java.library.version.development"]}-SNAPSHOT")
             }
         }
     }
