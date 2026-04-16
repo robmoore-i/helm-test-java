@@ -20,11 +20,16 @@ java {
 }
 
 dependencies {
-    // Unfortunately there is no package that just exports the ability to parse the models,
+    // Unfortunately, there is no package that just exports the ability to parse the models,
     // so we drag in the whole Java client. Not the end of the world.
     api("io.kubernetes:client-java:25.0.0")
 
     implementation("com.networknt:json-schema-validator:3.0.0")
+
+    // Security: pin vulnerable transitive dependencies to patched versions.
+    api(platform("com.fasterxml.jackson:jackson-bom:2.21.2"))
+    api(platform("io.netty:netty-bom:4.2.12.Final"))
+    implementation(platform("tools.jackson:jackson-bom:3.1.2"))
 }
 
 testing {
